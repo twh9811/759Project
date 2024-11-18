@@ -5,6 +5,7 @@ on:
 
 env:
   IMAGE_NAME: user/app
+  BAD_VAR: ${{ evil.reference.found.here }}
 
 jobs:
   docker:

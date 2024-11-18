@@ -27,13 +27,27 @@ class DockerActionTaintAnalysis:
     def taint_variable(self, variable):
         self.tainted_variables.add(variable)
     
+    def found_taints(self, workflow_string):
+        taints = re.findall(REFERENCE_PATTERN, workflow_string)
+        return len(taints) != 0
+    
     def process_workflow(self):
-        print(self.yaml_file)
-        
-    def process_jobs(self):
-        workflow_jobs = self.yaml_file["jobs"]
-        for job_name in workflow_jobs:
-            job_steps = workflow_jobs[job_name]["steps"]
+        for item in self.yaml_file:
+            next_workflow = self.yaml_file[item]
+            if item == "env":
+                self.process_env(next_workflow)
+            elif item == "jobs":
+                self.process_jobs(next_workflow)
+                
+    def process_env(self, env_workflow):
+        for env_variable in env_workflow:
+            variable_contents = env_workflow[env_variable]
+            if(self.found_taints(variable_contents)):
+                self.taint_variable(env_variable)
+            
+    def process_jobs(self, job_workflow):
+        for job_name in job_workflow:
+            job_steps = job_workflow[job_name]["steps"]
             self.process_bulk_steps(job_steps)
                     
     def process_bulk_steps(self, job_steps):
@@ -51,14 +65,14 @@ class DockerActionTaintAnalysis:
     def process_parameters(self, parameters):
         for parameter in parameters:
             parameter_instructions = str(parameters[parameter])
-            taints = re.findall(REFERENCE_PATTERN, parameter_instructions)
-            if(len(taints) != 0):
+            if(self.found_taints(parameter_instructions)):
                 self.taint_variable(parameter)
             
 def main():
     docker_file = "test_file.yaml"
     taint_analysis_obj = DockerActionTaintAnalysis(docker_file)
     taint_analysis_obj.process_workflow()
+    print(taint_analysis_obj.tainted_variables)
     # taint_analysis_obj.process_jobs()
     # print(taint_analysis_obj.tainted_variables)
     
