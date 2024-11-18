@@ -33,7 +33,6 @@ def analyze_workflow(docker_file):
     
 def main():
     docker_file = "test_file.yaml"
-    print(DOCKER_ACTIONS["docker/build-push-action@v6"])
     analyze_workflow(docker_file)
     
 if __name__ == "__main__":

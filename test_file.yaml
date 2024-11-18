@@ -9,7 +9,7 @@ jobs:
   test-docker-sinks:
     steps:
       - name: Build Docker Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: ${{ github.event.repository.html_url }}
           file: ${{ secrets.DOCKERFILE_PATH }}
@@ -34,7 +34,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker Image 2
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: ${{ github.event.repository.html_url }}
           file: ${{ secrets.DOCKERFILE_PATH }}
