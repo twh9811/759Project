@@ -1,6 +1,6 @@
 import yaml
 from yaml.loader import SafeLoader
-import json
+
 
 # These will be used in the "use" section to indicate which action is being used.
 DOCKER_ACTIONS = {
@@ -17,6 +17,7 @@ DOCKER_ACTIONS = {
     "docker/scout-action@v1" : []
     }
 
+
 class DockerActionTaintAnalysis:
     def __init__(self, docker_file):
         self.taint_set = set()
@@ -26,40 +27,40 @@ class DockerActionTaintAnalysis:
             # There can be dicts inside dicts inside dicts.
             self.yaml_file = yaml.load(docker_file, Loader=SafeLoader)
             
-    def is_tainted(self, variable):
-        return variable in self.taint_set
+    def is_tainted(self, step):
+        return step in self.taint_set
     
-    def process_jobs(self, docker_file):
-        with open(docker_file) as docker_file:
-            yaml_workflow = self.yaml_file
-            workflow_jobs = yaml_workflow["jobs"]
-            for job_name in workflow_jobs:
-                job_steps = workflow_jobs[job_name]["steps"]
-                self.process_jobs(job_steps)
+    def taint_step(self, step):
+        self.taint_set.add(step)
+    
+    def process_jobs(self):
+        workflow_jobs = self.yaml_file["jobs"]
+        for job_name in workflow_jobs:
+            job_steps = workflow_jobs[job_name]["steps"]
+            self.process_bulk_steps(job_steps)
                     
-    def process_st(self, job_steps):
-        for step_name in job_steps:
-            step = job_steps[step_name]
-            self.process_steps(step)
-    
-    def process_steps(self, steps):
-        pass
-        # print(steps)
-        # for step_name in steps:
+    def process_bulk_steps(self, job_steps):
+        # This will have ALL the steps of the job as dictionaries
+        for bulk_steps in job_steps:
+            self.process_individual_steps(bulk_steps)
             
-        #     # Gets the docker action being executed in the specific step
-        #     the_docker_action = step['uses']
-        #     # Gets the parameters passed into the specific step
-        #     action_parameters = step['with']
-        #     self.process_parameters(the_docker_action, action_parameters)
-    
+    def process_individual_steps(self, bulk_steps):
+        step_name = bulk_steps["name"]
+        docker_action = bulk_steps["uses"]
+        parameters = bulk_steps["with"]
+        self.process_parameters(docker_action, parameters)
+        
     def process_parameters(self, docker_action, parameters):
-        print(docker_action, parameters)
+        for parameter in parameters:
+            # Variable most likely tainted?
+            if parameter in DOCKER_ACTIONS[docker_action]["sources"]:
+                self.taint_step(parameters[parameter])
     
 def main():
     docker_file = "test_file.yaml"
-    taint_analysis_obj = DockerActionTaintAnalysis()
-    taint_analysis_obj.process_jobs(docker_file)
+    taint_analysis_obj = DockerActionTaintAnalysis(docker_file)
+    taint_analysis_obj.process_jobs()
+    print(taint_analysis_obj.taint_set)
     
 if __name__ == "__main__":
     main()

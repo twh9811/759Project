@@ -32,3 +32,27 @@ jobs:
           allow: always
           target: build-stage
           github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ github.event.repository.html_url }}
+          file: ${{ secrets.DOCKERFILE_PATH }}
+          tags: ${{ github.event.repository.name }}:${{ github.sha }}
+          build-args: |
+            ENV=${{ github.ref }}
+            COMMIT=${{ github.sha }}
+          labels: |
+            maintainer=${{ github.actor }}
+            description="Testing tainted sinks"
+          cache-from: type=registry,ref=${{ secrets.CACHE_FROM }}
+          cache-to: type=local,dest=./cache
+          secrets: |
+            key=${{ secrets.SECRET_KEY }}
+          secret-envs: secret_key=${{ secrets.SECRET_ENV_KEY }}
+          secret-files: ./path/to/secret/file
+          ssh: default
+          add-hosts: test-host:127.0.0.1
+          network: bridge
+          allow: always
+          target: build-stage
+          github-token: ${{ secrets.GITHUB_TOKEN }}
