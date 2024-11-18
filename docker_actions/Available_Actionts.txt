@@ -5,6 +5,9 @@ Taint Sink Criteria per Argus
 "Our taint sinks involve all entities enabling command execution. In the case of workflows, we consider every run: statement as a sink, 
 as they are used to construct a bash script. As for JavaScript, all functions capable of running arbitrary commands are classified as sinks."
 
+Uses: Specify the action or workflow to execute in the steps
+With: Provides input parameters to an action
+
 Build and push Docker images - https://github.com/marketplace/actions/build-and-push-docker-images
 
 Potential Sinks:
