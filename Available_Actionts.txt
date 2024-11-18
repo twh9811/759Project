@@ -5,3 +5,10 @@ Docker Metadata action
 Docker Setup QEMU
 Docker Buildx Bake
 Docker Scout
+
+Taint Source Criteria per Argus
+"We consider taint sources as all the data associated with an event that can be completely controlled by the user triggering the event."
+
+Taint Sink Criteria per Argus
+"Our taint sinks involve all entities enabling command execution. In the case of workflows, we consider every run: statement as a sink, 
+as they are used to construct a bash script. As for JavaScript, all functions capable of running arbitrary commands are classified as sinks."
