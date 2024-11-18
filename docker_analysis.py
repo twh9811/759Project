@@ -6,8 +6,11 @@ import re
 DOCKER_ACTIONS = ["docker/build-push-action@v6""docker/login-action@v2", "docker/setup-buildx-action@v2" , "docker/metadata-action@v4",  "docker/setup-qemu-action@v2",  "docker/buildx-bake-action@v1",  "docker/scout-action@v1"]
 
 # Extracts any text between {{ }}
-REFERENCE_PATTERN = "\{\{\s*(.*?)\s*\}\}"
+# Python magic strikes again. Need to escape the escape character to make it see the brackets as a string
+REFERENCE_PATTERN = '\\{\\{(.*)\\}\\}'
 
+
+test = {}
 class DockerActionTaintAnalysis:
     def __init__(self, docker_file):
         self.tainted_placeholders = set()
@@ -49,10 +52,13 @@ class DockerActionTaintAnalysis:
     def process_parameter_instructions(self, parameter_instructions):
         # Sometimes the data is stored in a variable, sometimes it is just referenced.
         # This handles both scenarios.
-        parameter_instructions = parameter_instructions.strip().replace("\n","").split("=")
-        print(parameter_instructions)
-        # split_instructions = parameter_instructions.strip()
-        # print(split_instructions)
+        
+        taints = re.findall(parameter_instructions, REFERENCE_PATTERN)
+        print(taints)
+        # # Taint the variable
+        # if "=" in parameter_instructions:
+        
+        # print(parameter_instructions)
 def main():
     docker_file = "test_file.yaml"
     taint_analysis_obj = DockerActionTaintAnalysis(docker_file)
