@@ -20,11 +20,8 @@ jobs:
           labels: |
             maintainer=${{ github.actor }}
             description="Testing tainted sinks"
-          platforms: linux/amd64,linux/arm64
           cache-from: type=registry,ref=${{ secrets.CACHE_FROM }}
           cache-to: type=local,dest=./cache
-          push: true
-          pull: true
           secrets: |
             key=${{ secrets.SECRET_KEY }}
           secret-envs: secret_key=${{ secrets.SECRET_ENV_KEY }}
@@ -48,11 +45,8 @@ jobs:
           labels: |
             maintainer=${{ github.actor }}
             description="Testing tainted sinks"
-          platforms: linux/amd64,linux/arm64
           cache-from: type=registry,ref=${{ secrets.CACHE_FROM }}
           cache-to: type=local,dest=./cache
-          push: true
-          pull: true
           secrets: |
             key=${{ secrets.SECRET_KEY }}
           secret-envs: secret_key=${{ secrets.SECRET_ENV_KEY }}
