@@ -1,9 +1,17 @@
 import yaml
 from yaml.loader import SafeLoader
-import re
+import json
 
 # These will be used in the "Use" section to indicate which action is being used.
-DOCKER_ACTIONS = ["docker/build-push-action@v6", "docker/login-action@v2", "docker/setup-buildx-action@v2", "docker/metadata-action@v4", "docker/setup-qemu-action@v2", "docker/buildx-bake-action@v1", "docker/scout-action@v1"]
+DOCKER_ACTIONS = {
+    "docker/build-push-action@v6" : ["add-hosts", "allow","annotations","build-args","build-contexts","cache-from","cache-to","context","file","labels","network","platforms","pull","push","secrets","secret-envs","secret-files","ssh","tags","target","github-token"], 
+    "docker/login-action@v2" : [], 
+    "docker/setup-buildx-action@v2" : [], 
+    "docker/metadata-action@v4" : [],  
+    "docker/setup-qemu-action@v2" : [],  
+    "docker/buildx-bake-action@v1" : [],  
+    "docker/scout-action@v1" : []
+    }
 
 
 def analyze_workflow(docker_file):
@@ -27,6 +35,7 @@ def analyze_workflow(docker_file):
     
 def main():
     docker_file = "test_file.yaml"
+    print(DOCKER_ACTIONS["docker/build-push-action@v6"])
     analyze_workflow(docker_file)
     
 if __name__ == "__main__":
