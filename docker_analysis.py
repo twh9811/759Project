@@ -7,13 +7,12 @@ DOCKER_ACTIONS = ["docker/build-push-action@v6""docker/login-action@v2", "docker
 
 # Extracts any text between {{ }}
 # Python magic strikes again. Need to escape the escape character to make it see the brackets as a string
-REFERENCE_PATTERN = '\\{\\{(.*)\\}\\}'
+REFERENCE_PATTERN = "\\{\\{(.*?)}}"
 
 
 test = {}
 class DockerActionTaintAnalysis:
     def __init__(self, docker_file):
-        self.tainted_placeholders = set()
         self.tainted_variables = set()
         self.yaml_file = None
         with open(docker_file) as docker_file:
@@ -24,9 +23,12 @@ class DockerActionTaintAnalysis:
     def is_tainted(self, step):
         return step in self.taint_set
     
-    def taint_step(self, step):
-        self.taint_set.add(step)
+    def taint_variable(self, variable):
+        self.tainted_variables.add(variable)
     
+    def process_workflow(self):
+        print(self.yaml_file)
+        
     def process_jobs(self):
         workflow_jobs = self.yaml_file["jobs"]
         for job_name in workflow_jobs:
@@ -41,28 +43,22 @@ class DockerActionTaintAnalysis:
     def process_individual_steps(self, bulk_steps):
         step_name = bulk_steps["name"]
         docker_action = bulk_steps["uses"]
-        parameters = bulk_steps["with"]
-        self.process_parameters(parameters)
-        
+        if "with" in bulk_steps:
+            parameters = bulk_steps["with"]
+            self.process_parameters(parameters)
+            
     def process_parameters(self, parameters):
         for parameter in parameters:
-            parameter_instructions = parameters[parameter]
-            self.process_parameter_instructions(parameter_instructions)
-                
-    def process_parameter_instructions(self, parameter_instructions):
-        # Sometimes the data is stored in a variable, sometimes it is just referenced.
-        # This handles both scenarios.
-        
-        taints = re.findall(parameter_instructions, REFERENCE_PATTERN)
-        print(taints)
-        # # Taint the variable
-        # if "=" in parameter_instructions:
-        
-        # print(parameter_instructions)
+            parameter_instructions = str(parameters[parameter])
+            taints = re.findall(REFERENCE_PATTERN, parameter_instructions)
+            if(len(taints) != 0):
+                self.taint_variable(parameter)
+            
 def main():
     docker_file = "test_file.yaml"
     taint_analysis_obj = DockerActionTaintAnalysis(docker_file)
     taint_analysis_obj.process_jobs()
+    print(taint_analysis_obj.tainted_variables)
     
 if __name__ == "__main__":
     main()
