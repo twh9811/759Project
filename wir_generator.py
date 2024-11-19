@@ -73,10 +73,10 @@ def parse_workflow(workflow_path):
                 # Gets the execution mechanism and what the task executed
                 if "uses" in step:
                     task_exec["type"] = "docker_action"
-                    task_exec["contents"] = step["uses"]
+                    task_exec["executed"] = step["uses"]
                 elif "run" in step:
                     task_exec["type"] = "command"
-                    task_exec["contents"] = step["uses"]
+                    task_exec["executed"] = step["uses"]
                 
                 # Gets the args used in the task.
                 if "with" in step:
@@ -96,7 +96,7 @@ def parse_workflow(workflow_path):
                     "exec" : task_exec,
                     "execution_id" : task_execution_id,
                     "args" : task_args,
-                    "environment" : [],
+                    "environment" : task_env,
                     "CIvars" : []
                 }
                 print(task)
