@@ -15,6 +15,7 @@ import re
 # Python magic strikes again. Need to escape the escape character to make it see the brackets as a string
 REFERENCE_PATTERN = "\\{\\{(.*?)}}"
 
+
 class WIR:
     def __init__(self, workflow_name):
         self.name = workflow_name
@@ -22,6 +23,7 @@ class WIR:
         self.dependencies = []
         
     def add_taskgroup(self, job_name, execution_id, steps, environment):
+        "jobs = taskgroup and tasks = steps"
         self.taskgroups[job_name] = {
             "execution_id": execution_id,
             "tasks" : steps,
@@ -56,7 +58,26 @@ def parse_workflow(workflow_path):
                 steps = job_contents["steps"]
             
             for step in steps:
-                print(step)
+                
+                # Gets the name of the task
+                if "name" in step:
+                    task_name = step["name"]
+                
+                # Gets the execution mechanism of the task 
+                if "uses" in step:
+                    execution_done = step["uses"]
+                    execution_mechanism = "docker_action"
+                elif "run" in step:
+                    execution_done = step["run"]
+                    execution_mechanism = "command"
+                    
+                task  = {
+                    "name" : task_name,
+                    "type" : execution_mechanism,
+                    "action_taken" : execution_done
+                }
+                    
+                print(task)
                     
  
             execution_id += 1
