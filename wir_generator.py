@@ -41,8 +41,26 @@ def parse_workflow(workflow_path):
             workflow_name = yaml_workflow["name"]
             
         workflow_intermediate_representation = WIR(workflow_name)
-        print(workflow_intermediate_representation)
-
+        
+        # Either there are no jobs to list or its filled with the jobs
+        jobs = {}
+        if "jobs" in yaml_workflow:
+            jobs = yaml_workflow["jobs"]
+            
+        execution_id = 0
+        for job_name in jobs:
+            job_contents = jobs[job_name]
+            
+            steps = {}
+            if "steps" in job_contents:
+                steps = job_contents["steps"]
+            
+            for step in steps:
+                print(step)
+                    
+ 
+            execution_id += 1
+          
         
 
 def main():
