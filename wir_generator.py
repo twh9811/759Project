@@ -19,7 +19,7 @@ class WIR:
     def __init__(self, workflow_name):
         self.name = workflow_name
         self.taskgroups = {}
-        self.dependencies = {}
+        self.dependencies = []
         
     def add_taskgroup(self, job_name, execution_id, steps, environment):
         self.taskgroups[job_name] = {
@@ -27,9 +27,27 @@ class WIR:
             "tasks" : steps,
             "environment" : environment
         }
+        
+    def __str__(self):
+        return self.name + "\n\t" + str(self.taskgroups) + "\n\t" + str(self.dependencies)
+        
+
+def parse_workflow(workflow_path):
+    with open(workflow_path) as str_workflow:
+        
+        yaml_workflow = yaml.load(str_workflow, Loader=SafeLoader)
+
+        if "name" in yaml_workflow:
+            workflow_name = yaml_workflow["name"]
+            
+        workflow_intermediate_representation = WIR(workflow_name)
+        print(workflow_intermediate_representation)
+
+        
 
 def main():
     github_action = "wir_test.yaml"
+    parse_workflow(github_action)
     
 if __name__ == "__main__":
     main()
