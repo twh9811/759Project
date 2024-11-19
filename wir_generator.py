@@ -26,8 +26,10 @@ class WIR:
         "jobs = taskgroup and tasks = steps"
         self.taskgroups[job_name] = job_steps_in_wir_format
         
-    def __str__(self):
-        return self.name + "\n\t" + str(self.taskgroups) + "\n\t" + str(self.dependencies)
+    def display_wir(self):
+        print(self.name)
+        for job_summary in self.taskgroups:
+            print(self.taskgroups[job_summary])
         
 
 def parse_workflow(workflow_path):
@@ -49,12 +51,15 @@ def parse_workflow(workflow_path):
         for job_name in jobs:
             job_contents = jobs[job_name]
             
+            job_env = {}
+            job_dependency = {}
+            job_tasks = {}
             # Gets the tasks that the job will execute
             steps = {}
             if "steps" in job_contents:
                 steps = job_contents["steps"]
             
-            job_tasks_in_wir = {}
+
             # All comments to describe variable initialization are definitions taken straight from the paper (mostly) 
             # Represents the relative order in which the task is executed within the task group
             task_execution_id = 0
@@ -70,8 +75,7 @@ def parse_workflow(workflow_path):
                 # The set of all GitHub variables accessed by the task. 
                 # Differs from args because this defines the specific GitHub variable and its type (i.e. secrets) ?
                 task_ci = {}
-                # No paper definition but this stores if the task relies on other tasks being executed first per example
-                task_dependencies = {}
+
                 
                 # Gets the name of the task. Should always be one. Rest aren't guaranteed
                 if "name" in step:
@@ -97,6 +101,13 @@ def parse_workflow(workflow_path):
                     for env_var in env_vars:
                         task_env[env_var] = env_vars[env_var]
                 
+                # idk if task needs this. they didnt in the example?
+                # if "needs" in step:
+                #     job_needed = step['needs']
+                #     # Scuffed logic but only way to get the proper reference index is to convert dict to list
+                #     reference_index = list(job_tasks_in_wir).index(job_needed)
+                #     print(reference_index)
+                
                 # Creates an object for the task
                 task_in_wir_format  = {
                     "exec" : task_exec,
@@ -106,18 +117,18 @@ def parse_workflow(workflow_path):
                     "CIvars" : []
                 }
                 # Store tasks in a group of overall tasks for the job
-                job_tasks_in_wir[task_name] = task_in_wir_format
+                job_tasks[task_name] = task_in_wir_format
                 task_execution_id += 1 
                 
-            workflow_intermediate_representation.add_taskgroup(job_name, job_tasks_in_wir)
-            print(workflow_intermediate_representation.taskgroups)
+            workflow_intermediate_representation.add_taskgroup(job_name, job_tasks)
             job_execution_id += 1
-          
+    return workflow_intermediate_representation
         
 
 def main():
     github_action = "wir_test.yaml"
-    parse_workflow(github_action)
+    wir = parse_workflow(github_action)
+    wir.display_wir()
     
 if __name__ == "__main__":
     main()
