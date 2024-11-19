@@ -49,7 +49,7 @@ def parse_workflow(workflow_path):
         if "jobs" in yaml_workflow:
             jobs = yaml_workflow["jobs"]
             
-        execution_id = 0
+        job_execution_id = 0
         for job_name in jobs:
             job_contents = jobs[job_name]
             
@@ -57,6 +57,7 @@ def parse_workflow(workflow_path):
             if "steps" in job_contents:
                 steps = job_contents["steps"]
             
+            task_execution_id = 0
             for step in steps:
                 
                 # Gets the name of the task
@@ -70,17 +71,21 @@ def parse_workflow(workflow_path):
                 elif "run" in step:
                     execution_done = step["run"]
                     execution_mechanism = "command"
-                    
+                
+                # Creates an object for the task
                 task  = {
                     "name" : task_name,
-                    "type" : execution_mechanism,
-                    "action_taken" : execution_done
+                    "execution_mechanism" : execution_mechanism,
+                    "execution_performed" : execution_done,
+                    "execution_id" : task_execution_id,
+                    "args" : [],
+                    "environment" : [],
+                    "CIvars" : []
                 }
                     
                 print(task)
-                    
- 
-            execution_id += 1
+                task_execution_id += 1
+            job_execution_id += 1
           
         
 
