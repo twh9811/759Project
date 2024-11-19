@@ -82,8 +82,6 @@ def main():
     taint_analysis_obj = DockerActionTaintAnalysis(docker_file)
     taint_analysis_obj.process_workflow()
     print(taint_analysis_obj.tainted_variables)
-    # taint_analysis_obj.process_jobs()
-    # print(taint_analysis_obj.tainted_variables)
     
 if __name__ == "__main__":
     main()

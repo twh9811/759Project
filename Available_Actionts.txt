@@ -9,6 +9,7 @@ Uses: Specify the action or workflow to execute in the steps
 With: Provides input parameters to an action
 
 Build and push Docker images - https://github.com/marketplace/actions/build-and-push-docker-images
+Example Execution: 
 
 Potential Sources (Parameters that allow external, potentially untrusted input):
 add-hosts           List of customs host-to-IP mapping (e.g., docker:10.180.0.1)
