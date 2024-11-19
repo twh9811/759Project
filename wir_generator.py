@@ -20,7 +20,6 @@ class WIR:
     def __init__(self, workflow_name):
         self.name = workflow_name
         self.taskgroups = {}
-        self.dependencies = {}
         
     def add_taskgroup(self, job_name, job_steps_in_wir_format):
         "jobs = taskgroup and tasks = steps"
@@ -28,8 +27,8 @@ class WIR:
         
     def display_wir(self):
         print(self.name)
-        for job_summary in self.taskgroups:
-            print(self.taskgroups[job_summary])
+        for job in self.taskgroups:
+            print(job, self.taskgroups[job])
         
 
 def parse_workflow(workflow_path):
@@ -46,7 +45,7 @@ def parse_workflow(workflow_path):
         jobs = {}
         if "jobs" in yaml_workflow:
             jobs = yaml_workflow["jobs"]
-            
+
         job_execution_id = 0
         for job_name in jobs:
             job_contents = jobs[job_name]
@@ -54,12 +53,19 @@ def parse_workflow(workflow_path):
             job_env = {}
             job_dependency = {}
             job_tasks = {}
+            
+            if "needs" in job_contents:
+                job_needed = job_contents['needs']
+                # Scuffed logic but only way to get the proper reference index is to convert dict to list
+                reference_index = list(workflow_intermediate_representation.taskgroups).index(job_needed)
+                job_dependency["ref"] = reference_index
+            
+            
             # Gets the tasks that the job will execute
             steps = {}
             if "steps" in job_contents:
                 steps = job_contents["steps"]
             
-
             # All comments to describe variable initialization are definitions taken straight from the paper (mostly) 
             # Represents the relative order in which the task is executed within the task group
             task_execution_id = 0
@@ -100,15 +106,9 @@ def parse_workflow(workflow_path):
                     env_vars = step["env"]
                     for env_var in env_vars:
                         task_env[env_var] = env_vars[env_var]
+            
                 
-                # idk if task needs this. they didnt in the example?
-                # if "needs" in step:
-                #     job_needed = step['needs']
-                #     # Scuffed logic but only way to get the proper reference index is to convert dict to list
-                #     reference_index = list(job_tasks_in_wir).index(job_needed)
-                #     print(reference_index)
-                
-                # Creates an object for the task
+                # Creates an object for the task portion of the job
                 task_in_wir_format  = {
                     "exec" : task_exec,
                     "execution_id" : task_execution_id,
@@ -119,8 +119,13 @@ def parse_workflow(workflow_path):
                 # Store tasks in a group of overall tasks for the job
                 job_tasks[task_name] = task_in_wir_format
                 task_execution_id += 1 
-                
-            workflow_intermediate_representation.add_taskgroup(job_name, job_tasks)
+            
+            job = {
+                "environment" : {},
+                "dependency": job_dependency,
+                "tasks" : job_tasks 
+            }
+            workflow_intermediate_representation.add_taskgroup(job_name, job)
             job_execution_id += 1
     return workflow_intermediate_representation
         
