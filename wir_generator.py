@@ -62,21 +62,21 @@ def parse_workflow(workflow_path):
             for step in steps:
                 # Declare the variables here.
                 task_name = ""
-                execution_done = ""
-                execution_mechanism = ""
+                task_exec = {}
                 task_args = {}
+                task_env = {}
                 
                 # Gets the name of the task
                 if "name" in step:
                     task_name = step["name"]
                 
-                # Gets the execution mechanism of the task 
+                # Gets the execution mechanism and what the task executed
                 if "uses" in step:
-                    execution_done = step["uses"]
-                    execution_mechanism = "docker_action"
+                    task_exec["type"] = "docker_action"
+                    task_exec["contents"] = step["uses"]
                 elif "run" in step:
-                    execution_done = step["run"]
-                    execution_mechanism = "command"
+                    task_exec["type"] = "command"
+                    task_exec["contents"] = step["uses"]
                 
                 # Gets the args used in the task.
                 if "with" in step:
@@ -84,11 +84,16 @@ def parse_workflow(workflow_path):
                     for arg in args:
                         task_args[arg] = args[arg]  
 
+                # Gets the environment setup for the task
+                if "env" in step:
+                    env_vars = step["env"]
+                    for env_var in env_vars:
+                        task_env[env_var] = env_vars[env_var]
+                        
                 # Creates an object for the task
                 task  = {
                     "name" : task_name,
-                    "execution_mechanism" : execution_mechanism,
-                    "execution_performed" : execution_done,
+                    "exec" : task_exec,
                     "execution_id" : task_execution_id,
                     "args" : task_args,
                     "environment" : [],
