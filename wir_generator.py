@@ -20,15 +20,11 @@ class WIR:
     def __init__(self, workflow_name):
         self.name = workflow_name
         self.taskgroups = {}
-        self.dependencies = []
+        self.dependencies = {}
         
-    def add_taskgroup(self, job_name, execution_id, steps, environment):
+    def add_taskgroup(self, job_name, job_steps_in_wir_format):
         "jobs = taskgroup and tasks = steps"
-        self.taskgroups[job_name] = {
-            "execution_id": execution_id,
-            "tasks" : steps,
-            "environment" : environment
-        }
+        self.taskgroups[job_name] = job_steps_in_wir_format
         
     def __str__(self):
         return self.name + "\n\t" + str(self.taskgroups) + "\n\t" + str(self.dependencies)
@@ -58,15 +54,26 @@ def parse_workflow(workflow_path):
             if "steps" in job_contents:
                 steps = job_contents["steps"]
             
+            job_tasks_in_wir = {}
+            # All comments to describe variable initialization are definitions taken straight from the paper (mostly) 
+            # Represents the relative order in which the task is executed within the task group
             task_execution_id = 0
             for step in steps:
-                # Declare the variables here.
+                # The name and other grouping attributes that identify a task.
                 task_name = ""
+                # All the information on “how” the task will be executed (e.g., through shell command or GitHub Actions).
                 task_exec = {}
+                # This had no paper definition but based on the examples it is the raw variables accessed by the task. 
                 task_args = {}
+                # Contains the set of environment variables accessed by the task.
                 task_env = {}
+                # The set of all GitHub variables accessed by the task. 
+                # Differs from args because this defines the specific GitHub variable and its type (i.e. secrets) ?
+                task_ci = {}
+                # No paper definition but this stores if the task relies on other tasks being executed first per example
+                task_dependencies = {}
                 
-                # Gets the name of the task
+                # Gets the name of the task. Should always be one. Rest aren't guaranteed
                 if "name" in step:
                     task_name = step["name"]
                 
@@ -89,18 +96,21 @@ def parse_workflow(workflow_path):
                     env_vars = step["env"]
                     for env_var in env_vars:
                         task_env[env_var] = env_vars[env_var]
-                        
+                
                 # Creates an object for the task
-                task  = {
-                    "name" : task_name,
+                task_in_wir_format  = {
                     "exec" : task_exec,
                     "execution_id" : task_execution_id,
                     "args" : task_args,
                     "environment" : task_env,
                     "CIvars" : []
                 }
-                print(task)
-                task_execution_id += 1
+                # Store tasks in a group of overall tasks for the job
+                job_tasks_in_wir[task_name] = task_in_wir_format
+                task_execution_id += 1 
+                
+            workflow_intermediate_representation.add_taskgroup(job_name, job_tasks_in_wir)
+            print(workflow_intermediate_representation.taskgroups)
             job_execution_id += 1
           
         
@@ -111,3 +121,5 @@ def main():
     
 if __name__ == "__main__":
     main()
+    
+    

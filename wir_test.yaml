@@ -23,6 +23,7 @@
           platforms: linux/amd64,linux/arm64
 
       - name: Build_env_test
+        needs: Checkout
         uses: docker/docker-build-push-action@v6
         env:
           DOCKER_BUILD_SUMMARY: false
