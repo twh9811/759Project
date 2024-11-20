@@ -125,7 +125,7 @@ def parse_workflow(workflow_path):
                     "execution_id" : task_execution_id,
                     "args" : task_args,
                     "environment" : task_env,
-                    "CIvars" : task_ci
+                    "CIvars" : {}
                 }
                 
                 # Store tasks in a group of overall tasks for the job
@@ -134,7 +134,7 @@ def parse_workflow(workflow_path):
             
             job = {
                 "execution_id": job_execution_id,
-                "environment" : job_env,
+                "environment" : {},
                 "dependency": job_dependency,
                 "tasks" : job_tasks 
             }
@@ -144,7 +144,7 @@ def parse_workflow(workflow_path):
         
 
 def main():
-    github_action = "wir_test.yaml"
+    github_action = "test_file.yaml"
     wir = parse_workflow(github_action)
     wir.display_wir()
     
