@@ -71,7 +71,11 @@ def parse_workflow(workflow_path):
                 reference_index = list(workflow_intermediate_representation.taskgroups).index(job_needed)
                 job_dependency["ref"] = reference_index
             
-            
+            if "env" in job_contents:
+                env_variables = job_contents["env"]
+                for env_variable in env_variables:
+                    env_contents = env_variables[env_variable]
+                    job_env[env_variable] = env_contents
             # Gets the tasks that the job will execute
             steps = {}
             if "steps" in job_contents:
@@ -134,7 +138,7 @@ def parse_workflow(workflow_path):
             
             job = {
                 "execution_id": job_execution_id,
-                "environment" : {},
+                "environment" : job_env,
                 "dependency": job_dependency,
                 "tasks" : job_tasks 
             }
