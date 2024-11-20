@@ -13,6 +13,7 @@ import re
 # Extracts any text between {{ }}
 # Python magic strikes again. Need to escape the escape character to make it see the brackets as a string
 REFERENCE_PATTERN = "\\{\\{(.*?)}}"
+GITHUB_CI_VARS = ["secrets.", "github.", "docker.","env.","inputs.","jobs."]
 
 
 class WIR:
@@ -146,7 +147,13 @@ def parse_workflow(workflow_path):
                 if "with" in step:
                     args = step["with"]
                     for arg in args:
-                        task_args[arg] = args[arg]  
+                        arg_contents = args[arg]
+                        task_args[arg] = arg_contents
+
+                        for ci_indicator in GITHUB_CI_VARS:
+                            if type(arg_contents) is not bool and ci_indicator in arg_contents:
+                                print(ci_indicator)
+                            
 
                 # Gets the environment setup for the task
                 if "env" in step:
