@@ -151,8 +151,8 @@ def parse_workflow(workflow_path):
                         arg_contents = args[arg]
                         task_args[arg] = arg_contents
                         for ci_indicator in GITHUB_CI_VARS:
+                            # contents are booleans sometimes which breaks this, luckily none of them are CI vars.
                             if type(arg_contents) is not bool and ci_indicator in arg_contents:
-                                print(arg_contents)
                                 no_bracket_args = re.findall(REFERENCE_PATTERN, arg_contents)
                                 if(len(no_bracket_args) > 0):
                                     no_brack_args_cleaned = no_bracket_args[0].strip()
