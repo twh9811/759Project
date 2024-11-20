@@ -26,9 +26,20 @@ class WIR:
         self.taskgroups[job_name] = job_steps_in_wir_format
         
     def display_wir(self):
-        print(self.name)
+        print("Workflow:", self.name)
         for job in self.taskgroups:
-            print(job, self.taskgroups[job])
+            job_contents = self.taskgroups[job]
+            print(" Taskgroup:", job)
+            print("  Execution ID", job_contents["execution_id"])
+            print("  Environment", job_contents["environment"])
+            print("  dependency", job_contents["dependency"])
+            print("  Tasks:")
+            for task in job_contents["tasks"]:
+                task_contents = job_contents["tasks"][task]
+                print("   Task:", task)
+                for step in task_contents:
+                    step_contents = task_contents[step]
+                    print("    ", step + ":", step_contents)
         
 
 def parse_workflow(workflow_path):
@@ -114,14 +125,16 @@ def parse_workflow(workflow_path):
                     "execution_id" : task_execution_id,
                     "args" : task_args,
                     "environment" : task_env,
-                    "CIvars" : []
+                    "CIvars" : task_ci
                 }
+                
                 # Store tasks in a group of overall tasks for the job
                 job_tasks[task_name] = task_in_wir_format
                 task_execution_id += 1 
             
             job = {
-                "environment" : {},
+                "execution_id": job_execution_id,
+                "environment" : job_env,
                 "dependency": job_dependency,
                 "tasks" : job_tasks 
             }
