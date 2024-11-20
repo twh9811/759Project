@@ -1,4 +1,3 @@
-
 #WIR Task Attributes
 # Identity - Name of Step
 # Execution Mechanism - indicated with "run"
@@ -21,11 +20,24 @@ class WIR:
         self.name = workflow_name
         self.taskgroups = {}
         
-    def add_taskgroup(self, job_name, job_steps_in_wir_format):
-        "jobs = taskgroup and tasks = steps"
-        self.taskgroups[job_name] = job_steps_in_wir_format
+    def add_taskgroup(self, job_name, job_in_wir_format):
+        """
+        Stores a job that has been converted into wir format in the main WIR object.
+        Uses the job name as the key.
+        
+        Confusing function name but taskgroups are the same as jobs (as jobs are just a group of tasks).
+        The same goes for steps and tasks, they are the same. Steps are the tasks that a job executes.
+
+        Args:
+            job_name (string): Name of the job to be used as the storage key
+            job_steps_in_wir_format (dictionary): Workflow in WIR format. Basically a bunch of nested dictionaries
+        """
+        self.taskgroups[job_name] = job_in_wir_format
         
     def display_wir(self):
+        """
+        Displays the WIR in a nicely formatted string. Not __str__ because that would be more annoying to format
+        """
         print("Workflow:", self.name)
         for job in self.taskgroups:
             job_contents = self.taskgroups[job]
@@ -43,6 +55,17 @@ class WIR:
         
 
 def parse_workflow(workflow_path):
+    """
+    Parses the workflow YAML file. Split into two main sections:
+    Parsing the jobs and parsing the tasks inside the jobs.
+    It builds a workflow intermediate representation according to the criteria established in the paper, see comment at top.
+
+    Args:
+        workflow_path (str): filepath of the workflow to build the WIR for
+
+    Returns:
+        WIR Object: A workflow intermediate representation of the entire workflow
+    """
     with open(workflow_path) as str_workflow:
         
         yaml_workflow = yaml.load(str_workflow, Loader=SafeLoader)
@@ -51,6 +74,10 @@ def parse_workflow(workflow_path):
             workflow_name = yaml_workflow["name"]
             
         workflow_intermediate_representation = WIR(workflow_name)
+        
+        # =====================================================
+        # The following focuses on the jobs inside the workflow
+        # =====================================================
         
         # Gets the jobs that will be executed in the workflow
         jobs = {}
@@ -76,6 +103,11 @@ def parse_workflow(workflow_path):
                 for env_variable in env_variables:
                     env_contents = env_variables[env_variable]
                     job_env[env_variable] = env_contents
+                    
+            # ==================================================
+            # The following  focuses on the tasks inside the job
+            # ==================================================
+            
             # Gets the tasks that the job will execute
             steps = {}
             if "steps" in job_contents:
@@ -123,7 +155,7 @@ def parse_workflow(workflow_path):
                         task_env[env_var] = env_vars[env_var]
             
                 
-                # Creates an object for the task portion of the job
+                # Creates an WIR representation for the task portion of the job
                 task_in_wir_format  = {
                     "exec" : task_exec,
                     "execution_id" : task_execution_id,
@@ -136,14 +168,19 @@ def parse_workflow(workflow_path):
                 job_tasks[task_name] = task_in_wir_format
                 task_execution_id += 1 
             
+            # Creates an WIR representation for the job.
             job = {
                 "execution_id": job_execution_id,
                 "environment" : job_env,
                 "dependency": job_dependency,
                 "tasks" : job_tasks 
             }
+            
+            # Job is added to the main WIR object.
             workflow_intermediate_representation.add_taskgroup(job_name, job)
             job_execution_id += 1
+            
+    # WIR should be built when all workflow is parsed
     return workflow_intermediate_representation
         
 
