@@ -13,7 +13,7 @@ import re
 # Extracts any text between {{ }}
 # Python magic strikes again. Need to escape the escape character to make it see the brackets as a string
 REFERENCE_PATTERN = "\\{\\{(.*?)}}"
-GITHUB_CI_VARS = ["secrets.", "github.", "docker.","env.","inputs.","jobs."]
+GITHUB_CI_VARS = ["secrets.", "github.", "docker.","env.","inputs.","jobs.","steps."]
 
 
 class WIR:
@@ -128,7 +128,7 @@ def parse_workflow(workflow_path):
                 task_env = {}
                 # The set of all GitHub variables accessed by the task. 
                 # Differs from args because this defines the specific GitHub variable and its type (i.e. secrets) ?
-                task_ci = {}
+                task_ci = []
 
                 
                 # Gets the name of the task. Should always be one. Rest aren't guaranteed
@@ -146,15 +146,27 @@ def parse_workflow(workflow_path):
                 # Gets the args used in the task.
                 if "with" in step:
                     args = step["with"]
+                    arg_ref = 0
                     for arg in args:
                         arg_contents = args[arg]
                         task_args[arg] = arg_contents
-
                         for ci_indicator in GITHUB_CI_VARS:
                             if type(arg_contents) is not bool and ci_indicator in arg_contents:
-                                print(ci_indicator)
+                                print(arg_contents)
+                                no_bracket_args = re.findall(REFERENCE_PATTERN, arg_contents)
+                                if(len(no_bracket_args) > 0):
+                                    no_brack_args_cleaned = no_bracket_args[0].strip()
+                                    split_arg = no_brack_args_cleaned.split(".", 1)
+                                    var_type = split_arg[0]
+                                    name = split_arg[1]
+                                    ci_var_in_wir_format = {
+                                        "type": var_type,
+                                        "name": name,
+                                        "arg_ref": arg_ref
+                                    }
+                                    task_ci.append(ci_var_in_wir_format)
+                        arg_ref += 1
                             
-
                 # Gets the environment setup for the task
                 if "env" in step:
                     env_vars = step["env"]
@@ -168,7 +180,7 @@ def parse_workflow(workflow_path):
                     "execution_id" : task_execution_id,
                     "args" : task_args,
                     "environment" : task_env,
-                    "CIvars" : {}
+                    "CIvars" : task_ci
                 }
                 
                 # Store tasks in a group of overall tasks for the job
@@ -192,7 +204,7 @@ def parse_workflow(workflow_path):
         
 
 def main():
-    github_action = "test_file.yaml"
+    github_action = "wir_test.yaml"
     wir = parse_workflow(github_action)
     wir.display_wir()
     
