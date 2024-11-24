@@ -15,7 +15,6 @@ import re
 REFERENCE_PATTERN = "\\{\\{(.*?)}}"
 GITHUB_CI_VARS = ["secrets.", "github.", "docker.","env.","inputs.","jobs.","steps."]
 
-
 class WIR:
     def __init__(self, workflow_name):
         self.name = workflow_name
