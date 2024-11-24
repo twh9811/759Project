@@ -139,6 +139,7 @@ def parse_workflow(workflow_path):
                 if "uses" in step:
                     task_exec["type"] = "docker_action"
                     task_exec["executed"] = step["uses"]
+                    print(step["uses"])
                 elif "run" in step:
                     task_exec["type"] = "command"
                     task_exec["executed"] = step["uses"]
@@ -204,7 +205,7 @@ def parse_workflow(workflow_path):
         
 
 def main():
-    github_action = "wir_test.yaml"
+    github_action = "action.yaml"
     wir = parse_workflow(github_action)
     wir.display_wir()
     
