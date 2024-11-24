@@ -1,4 +1,5 @@
 import wir_generator
+import generate_action_summary
 
 # Taint summary support?
 DOCKER_ACTIONS = ["docker/build-push-action@v6""docker/login-action@v2", "docker/setup-buildx-action@v2" , "docker/metadata-action@v4",  "docker/setup-qemu-action@v2",  "docker/buildx-bake-action@v1",  "docker/scout-action@v1"]
@@ -18,6 +19,8 @@ class DockerActionTaintAnalysis:
 
     
 def main():
+    summaries = generate_action_summary.Taint_Summaries()
+    
     github_action = "wir_test.yaml"
     workflow_representation = wir_generator.parse_workflow(github_action)
     taint_analysis_obj = DockerActionTaintAnalysis(workflow_representation)

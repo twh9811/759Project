@@ -17,9 +17,10 @@ GITHUB_CI_VARS = ["secrets.", "github.", "docker.","env.","inputs.","jobs.","ste
 
 
 class WIR:
-    def __init__(self, workflow_name):
+    def __init__(self, workflow_name, summaries):
         self.name = workflow_name
         self.taskgroups = {}
+        self.summaries = summaries
         
     def add_taskgroup(self, job_name, job_in_wir_format):
         """
@@ -53,7 +54,9 @@ class WIR:
                 for step in task_contents:
                     step_contents = task_contents[step]
                     print("    ", step + ":", step_contents)
-        
+    
+    def get_summaries(self):
+        return self.summaries
 
 def parse_workflow(workflow_path):
     """
