@@ -23,9 +23,9 @@ inputs:
     description: 'Log out from the Docker registry at the end of a job'
     default: 'true'
     required: false
-  outputs:
-    test:
-      description: 'literally just a parsing test'
+outputs:
+  test:
+    description: 'literally just a parsing test'
 
 runs:
   using: 'node20'

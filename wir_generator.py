@@ -17,10 +17,9 @@ GITHUB_CI_VARS = ["secrets.", "github.", "docker.","env.","inputs.","jobs.","ste
 
 
 class WIR:
-    def __init__(self, workflow_name, summaries):
+    def __init__(self, workflow_name):
         self.name = workflow_name
         self.taskgroups = {}
-        self.summaries = summaries
         
     def add_taskgroup(self, job_name, job_in_wir_format):
         """
@@ -54,9 +53,6 @@ class WIR:
                 for step in task_contents:
                     step_contents = task_contents[step]
                     print("    ", step + ":", step_contents)
-    
-    def get_summaries(self):
-        return self.summaries
 
 def parse_workflow(workflow_path):
     """
@@ -76,7 +72,7 @@ def parse_workflow(workflow_path):
 
         if "name" in yaml_workflow:
             workflow_name = yaml_workflow["name"]
-            
+
         workflow_intermediate_representation = WIR(workflow_name)
         
         # =====================================================
@@ -140,9 +136,9 @@ def parse_workflow(workflow_path):
                 
                 # Gets the execution mechanism and what the task executed
                 if "uses" in step:
-                    task_exec["type"] = "docker_action"
-                    task_exec["executed"] = step["uses"]
-                    print(step["uses"])
+                    if "docker" in step["uses"]:
+                        task_exec["type"] = "docker_action"
+                        task_exec["executed"] = step["uses"]
                 elif "run" in step:
                     task_exec["type"] = "command"
                     task_exec["executed"] = step["uses"]
@@ -208,7 +204,7 @@ def parse_workflow(workflow_path):
         
 
 def main():
-    github_action = "action.yaml"
+    github_action = "wir_test.yaml"
     wir = parse_workflow(github_action)
     wir.display_wir()
     

@@ -6,29 +6,35 @@ class Taint_Summaries:
     
     def __init__(self):
         self.summaries = {}
+        
+    def get_yaml(self, action_file):
+        with open(action_file) as action_file:
+            action_workflow = yaml.load(action_file, Loader=SafeLoader)
+        action_file.close()
+        return action_workflow
     
     def add_summary(self, name, taint_summary):
         self.summaries[name] = taint_summary
     
     def display_summaries(self):
         print(self.summaries)
-        
+    
     def parse_action(self, action_file):
+        action_workflow = self.get_yaml(action_file)
+        
         taint_summary = {}
-        with open(action_file) as action_file:
-            action_workflow = yaml.load(action_file, Loader=SafeLoader)
+        if "name" in action_workflow:
+            workflow_name = action_workflow["name"]
+        
+        # Potential Taint Sources
+        if "inputs" in action_workflow:
+            workflow_inputs = action_workflow["inputs"]
+            taint_summary["inputs"] = list(workflow_inputs.keys())
             
-            if "name" in action_workflow:
-                workflow_name = action_workflow["name"]
-            
-            if "inputs" in action_workflow:
-                workflow_inputs = action_workflow["inputs"]
-                taint_summary["inputs"] = workflow_inputs
-                
-            if "outputs" in action_workflow:
-                workflow_outputs = action_workflow["outputs"]
-                taint_summary["outputs"] = workflow_outputs
-        action_file.close()
+        # Potential Taint Sinks
+        if "outputs" in action_workflow:
+            workflow_outputs = action_workflow["outputs"]
+            taint_summary["outputs"] = list(workflow_outputs.keys())
         
         self.add_summary(workflow_name, taint_summary)
     
