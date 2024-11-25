@@ -27,7 +27,7 @@ class Docker_Action_Taint_Analysis:
             for task in tasks:
                 print("  Analyzing Task:", task)
                 
-                # These indicate the initial taint sources from the workflow.
+                # Find the initial taint sources from the main workflow.
                 ci_vars = tasks[task]["CIvars"]
                 args = tasks[task]["args"]
                 for var in ci_vars:
@@ -43,6 +43,7 @@ class Docker_Action_Taint_Analysis:
                     
                         
                 
+                # Look at Docker Action Taints
                 print("   Analyzing Task:", task)
                 task_obj = tasks[task]
                 # Gets rid of the version tag for the action
@@ -53,7 +54,7 @@ class Docker_Action_Taint_Analysis:
                 taint_summary = None
                 if docker_action in self.summaries:
                     taint_summary = self.summaries[docker_action]
-                    print("      Taint Summary Found")
+                    print("      Taint Summary Found:", taint_summary)
                     action_inputs = taint_summary['inputs']
                     for inputs in action_inputs:
                         tainted_var_str = "\'" + inputs + "\'"

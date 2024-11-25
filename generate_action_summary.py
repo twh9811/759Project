@@ -1,6 +1,9 @@
 import yaml
 from yaml import SafeLoader
 import os
+import re
+
+REFERENCE_PATTERN = "\\{\\{(.*?)}}"
 
 class Taint_Summaries:
     
@@ -21,10 +24,11 @@ class Taint_Summaries:
         base_dir = "example/"
         files = os.listdir(base_dir)
         for file in files:
-            action_file = base_dir + file
-            # Takes off .yaml extension
-            action_name = file[:-5]
-            self.parse_action(action_name, action_file)
+            if "action" in file:
+                action_file = base_dir + file
+                # Takes off .yaml extension
+                action_name = file[:-5]
+                self.parse_action(action_name, action_file)
             
     def parse_action(self, name, action_file):
         action_workflow = get_yaml(action_file)
@@ -47,7 +51,15 @@ class Taint_Summaries:
         if "runs" in action_workflow:
             runs_obj = action_workflow["runs"]
             taint_summary['container_image'] = runs_obj['image']
-            taint_summary['container_args'] = runs_obj['args']
+            action_args = runs_obj['args']
+            
+            action_sinks = []
+            for arg in action_args:
+                arg_sinks = re.findall(REFERENCE_PATTERN, arg)
+                if len(arg_sinks) > 0:
+                    for sink in arg_sinks:
+                        action_sinks.append(sink.strip())
+            taint_summary["sinks"] = action_sinks     
         self.add_summary(name, taint_summary)
         
 def get_yaml(action_file):
