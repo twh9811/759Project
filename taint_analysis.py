@@ -30,6 +30,7 @@ class Docker_Action_Taint_Analysis:
             for task in tasks:
                 print("   Analyzing Task:", task)
                 task_obj = tasks[task]
+                print(task_obj)
                 # Gets rid of the version tag for the action
                 docker_action = task_obj['exec']['executed'].split("@")[0]
                 

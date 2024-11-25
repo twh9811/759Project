@@ -11,7 +11,7 @@ inputs:
 
 outputs:
   token:
-    description: "Generated token"
+    description: "Testing token"
 
 runs:
   using: "docker"

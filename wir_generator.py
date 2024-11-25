@@ -215,7 +215,7 @@ def parse_workflow(workflow_path):
         
 
 def main():
-    github_action = "wir_test.yaml"
+    github_action = "offline_workflows_for_summary/sample-workflow.yaml"
     wir = parse_workflow(github_action)
     wir.display_wir()
     

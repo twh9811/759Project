@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Docker Action Example
-        uses: sample_action@v1
+        uses: docker/sample-action@v1
         with:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
