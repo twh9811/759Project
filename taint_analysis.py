@@ -16,6 +16,8 @@ class Docker_Action_Taint_Analysis:
     def taint_variable(self, variable):
         self.tainted_variables.add(variable)
 
+    def get_tainted_variables(self):
+        return self.tainted_variables
 
     def perform_analysis(self):
         print("Analyzing Workflow:", self.wir.get_name())
@@ -40,10 +42,10 @@ class Docker_Action_Taint_Analysis:
                     # Checks to see if input could be tainted
                     if self.is_tainted(inputs):
                         print("        Variable: ", inputs, "is tainted")
-                        # If its marked as tainted, the outputs will be affected as well
-                        for outputs in taint_summary["outputs"]:
-                            print("          Variable: ", outputs, "is tainted because it used a value touched by", inputs)
-                            self.taint_variable(outputs)
+                        # # If its marked as tainted, the outputs will be affected as well
+                        # for outputs in taint_summary["outputs"]:
+                        #     print("          Variable: ", outputs, "is tainted because it used a value touched by", inputs)
+                        #     self.taint_variable(outputs)
                             
 
 def main():

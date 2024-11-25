@@ -1,6 +1,7 @@
 import yaml
 from yaml import SafeLoader
 import os
+import wir_generator
 
 class Taint_Summaries:
     
@@ -31,15 +32,19 @@ class Taint_Summaries:
         
         taint_summary = {}
         
-        # Potential Taint Sources
+        # Input parameters allow you to specify data that the action expects to use during runtime. GitHub stores input parameters as environment variables.
         if "inputs" in action_workflow:
             workflow_inputs = action_workflow["inputs"]
             taint_summary["inputs"] = list(workflow_inputs.keys())
             
-        # Potential Taint Sinks
+        # Output parameters allow you to declare data that an action sets. Actions that run later in a workflow can use the output data set in previously run actions.
         if "outputs" in action_workflow:
             workflow_outputs = action_workflow["outputs"]
             taint_summary["outputs"] = list(workflow_outputs.keys())
+            
+        # Configures the image used for the Docker container action OR
+        if "runs" in action_workflow:
+            runs_obj = action_workflow["runs"]
         
         self.add_summary(name, taint_summary)
         
