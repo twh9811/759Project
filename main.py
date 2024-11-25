@@ -11,6 +11,7 @@ def main():
     workflow_intermediate_representation = wir_generator.parse_workflow(main_workflow)
     # Step 3: Perform static analysis on the WIR, using taint summaries for actions
     taint_analysis_summary = taint_analysis.Docker_Action_Taint_Analysis(workflow_intermediate_representation, taint_summaries)
-    
+    taint_analysis_summary.taint_variable("username")
+    taint_analysis_summary.taint_variable("password")
 if __name__ == "__main__":
     main()

@@ -7,12 +7,6 @@ class Taint_Summaries:
     def __init__(self):
         self.summaries = {}
         self.preload_summaries()
-        
-    def get_yaml(self, action_file):
-        with open(action_file) as action_file:
-            action_workflow = yaml.load(action_file, Loader=SafeLoader)
-        action_file.close()
-        return action_workflow
     
     def add_summary(self, name, taint_summary):
         self.summaries[name] = taint_summary
@@ -33,7 +27,7 @@ class Taint_Summaries:
             self.parse_action(action_name, action_file)
             
     def parse_action(self, name, action_file):
-        action_workflow = self.get_yaml(action_file)
+        action_workflow = get_yaml(action_file)
         
         taint_summary = {}
         
@@ -48,7 +42,13 @@ class Taint_Summaries:
             taint_summary["outputs"] = list(workflow_outputs.keys())
         
         self.add_summary(name, taint_summary)
-    
+        
+def get_yaml(action_file):
+    with open(action_file) as action_file:
+        action_workflow = yaml.load(action_file, Loader=SafeLoader)
+    action_file.close()
+    return action_workflow
+
 def main():
     summary_database = Taint_Summaries()
     summary_database.preload_summaries()
