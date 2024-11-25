@@ -30,29 +30,28 @@ class Docker_Action_Taint_Analysis:
                 # Find the initial taint sources from the main workflow.
                 ci_vars = tasks[task]["CIvars"]
                 args = tasks[task]["args"]
+                print("   Finding Taint Sources Based on Task CIVars (GitHub Events)")
                 for var in ci_vars:
-                    print("   Finding Taint Sources Based on Task CIVars (GitHub Events/User Secrets)")
                     arg_index = var['arg_ref']
                     tainted_variable = list(args.keys())[arg_index]
-                    if var['type'] == "secrets":
-                        print("    Variable \'" + tainted_variable + "\' has been tainted directly from user input (user secret)")
-                        self.taint_variable(tainted_variable)
-                    elif var['type'] == "github":
+                    if var['type'] == "github":
                         print("    Variable \'" + tainted_variable + "\' has been tainted directly from user input (GitHub event)")
                         self.taint_variable(tainted_variable)
                 
-                # Look at Docker Action Taints
-                print("\n   Analyzing Task:", task)
                 task_obj = tasks[task]
-                # Gets rid of the version tag for the action
-                docker_action = task_obj['exec']['executed'].split("@")[0]
-                docker_action_str = "Docker Action: \'" + docker_action + "\'"
-                print("    Uses Docker Action:", docker_action_str)
-                
-                taint_summary = None
-                if docker_action in self.summaries:
-                    taint_summary = self.summaries[docker_action]
-                    print("      Taint Summary Found:", taint_summary)
-                    for sink in taint_summary['sinks']:
-                        print("        Tainted Variable \'" + sink + "\' has been tained by a tainted source propagating to the Docker Action")
-                        self.taint_variable(sink)
+                # Look at Docker Action Taints. Only they have the exec tag I believe
+                if "executed" in task_obj['exec']:
+                    if task_obj['exec'] != 'docker_action':
+                        continue
+                    # Gets rid of the version tag for the action
+                    docker_action = task_obj['exec']['executed'].split("@")[0]
+                    docker_action_str = "Docker Action: \'" + docker_action + "\'"
+                    print("    Uses Docker Action:", docker_action_str)
+                    
+                    taint_summary = None
+                    if docker_action in self.summaries:
+                        taint_summary = self.summaries[docker_action]
+                        print("      Taint Summary Found:", taint_summary)
+                        for sink in taint_summary['sinks']:
+                            print("        Tainted Variable \'" + sink + "\' has been tained by a tainted source propagating to the Docker Action")
+                            self.taint_variable(sink)

@@ -21,7 +21,8 @@ class Taint_Summaries:
         print(self.summaries)
     
     def preload_summaries(self):
-        base_dir = "example/"
+        #base_dir = "example/"
+        base_dir = "slack-notification-action/"
         files = os.listdir(base_dir)
         for file in files:
             if "action" in file:
@@ -50,16 +51,22 @@ class Taint_Summaries:
         # This shows where the tainted vars propagate to.
         if "runs" in action_workflow:
             runs_obj = action_workflow["runs"]
+            # Not a docker action.
+            if "image" not in runs_obj:
+                return
             taint_summary['container_image'] = runs_obj['image']
-            action_args = runs_obj['args']
             
-            action_sinks = []
-            for arg in action_args:
-                arg_sinks = re.findall(REFERENCE_PATTERN, arg)
-                if len(arg_sinks) > 0:
-                    for sink in arg_sinks:
-                        action_sinks.append(sink.strip())
-            taint_summary["sinks"] = action_sinks     
+            # Passes in args to docker container. Final sink before execution
+            if "args" in runs_obj:
+                action_args = runs_obj['args']
+                
+                action_sinks = []
+                for arg in action_args:
+                    arg_sinks = re.findall(REFERENCE_PATTERN, arg)
+                    if len(arg_sinks) > 0:
+                        for sink in arg_sinks:
+                            action_sinks.append(sink.strip())
+                taint_summary["sinks"] = action_sinks     
         self.add_summary(name, taint_summary)
         
 def get_yaml(action_file):

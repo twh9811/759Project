@@ -152,7 +152,7 @@ def parse_workflow(workflow_path):
                     task_exec["executed"] = step["uses"][7:]
             elif "run" in step:
                 task_exec["type"] = "command"
-                task_exec["executed"] = step["uses"]
+                task_exec["executed"] = step["run"]
             
             # Gets the args used in the task.
             if "with" in step:
@@ -215,7 +215,8 @@ def parse_workflow(workflow_path):
         
 
 def main():
-    github_action = "example/sample-workflow.yaml"
+    #github_action = "example/sample-workflow.yaml"
+    github_action = "slack-notification-action/slack-notification-workflow.yaml"
     wir = parse_workflow(github_action)
     wir.display_wir()
     

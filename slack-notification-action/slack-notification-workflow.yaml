@@ -1,0 +1,41 @@
+name: Slack Notification
+
+# This action is ran any time a reviewer is added to a pull request
+on:
+  pull_request:
+    types:
+      - review_requested
+
+jobs:
+  notify_slack:
+    # Prevents multiple notifications going out when adding multiple reviewers after PR is opened
+    concurrency:
+        group: ${{ github.workflow }}-${{ github.ref }}
+        cancel-in-progress: true
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+
+        - name: Sleep
+          run: |
+            echo "Sleeping for 10 seconds to allow a chance to prevent concurrent notifications"
+            sleep 10
+        
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+
+        - name: Notify Slack
+          uses: kapost/slack-notification@script-update
+          env:
+            MAPPING_URL: s3://my-bucket/path/to/mapping.yml
+            NOTIFIED_USERS_URL: s3://my-bucket/pull-requests/app/${{ github.event.pull_request.number }}/notified-users.txt
+            PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+            PR_NUMBER: ${{ github.event.pull_request.number }}
+            GITHUB_REPO: kapost/slack-notification
+            PR_MESSAGE: "A Pull Request has been created for your approval by @${{ github.actor }}\nPR Title: ${{ github.event.pull_request.title }}\nPR Link: ${{ github.event.pull_request.html_url}}"
+
