@@ -1,7 +1,7 @@
 import wir_generator
 import generate_action_summary
 import taint_analysis
-BASE_DIR = "offline_workflows_for_summary/"
+BASE_DIR = "example/"
 
 def main():
     main_workflow = BASE_DIR + "sample-workflow.yaml"
