@@ -47,7 +47,8 @@ class Docker_Action_Taint_Analysis:
                 task_obj = tasks[task]
                 # Gets rid of the version tag for the action
                 docker_action = task_obj['exec']['executed'].split("@")[0]
-                print("    Uses Docker Action: \'" + docker_action + "\'")
+                docker_action_str = "Docker Action: \'" + docker_action + "\'"
+                print("    Uses Docker Action:", docker_action_str)
                 
                 taint_summary = None
                 if docker_action in self.summaries:
@@ -55,5 +56,7 @@ class Docker_Action_Taint_Analysis:
                     print("      Taint Summary Found")
                     action_inputs = taint_summary['inputs']
                     for inputs in action_inputs:
+                        tainted_var_str = "\'" + inputs + "\'"
                         if self.is_tainted(inputs):
-                            print("      Tainted Variable \'" + inputs + "\' has propagated to the Docker Action: \'" + docker_action + "\'")
+                            print("      Tainted Variable", tainted_var_str, "has propagated to the Docker Action:", docker_action_str)
+                            print("       ", docker_action_str, "uses", tainted_var_str, "as args in", taint_summary['container_image'])
