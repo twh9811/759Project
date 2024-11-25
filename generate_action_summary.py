@@ -31,10 +31,14 @@ class Taint_Summaries:
                 action_name = file[:-5]
                 self.parse_action(action_name, action_file)
             
-    def parse_action(self, name, action_file):
-        action_workflow = get_yaml(action_file)
-        
+    def parse_action(self, name, action_file=None):
         taint_summary = {}
+        if(action_file is None):
+            pass
+        else:
+            action_workflow = get_yaml(action_file)
+        
+
         
         # Input parameters allow you to specify data that the action expects to use during runtime. GitHub stores input parameters as environment variables.
         if "inputs" in action_workflow:
