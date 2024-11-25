@@ -43,30 +43,16 @@ class Docker_Action_Taint_Analysis:
                 task_obj = tasks[task]
                 # Gets rid of the version tag for the action
                 docker_action = task_obj['exec']['executed'].split("@")[0]
-                print("    Uses Docker Action \'" + docker_action + "\'")
+                print("    Uses Docker Action: \'" + docker_action + "\'")
                 
                 taint_summary = None
                 if docker_action in self.summaries:
                     taint_summary = self.summaries[docker_action]
                     print("      Taint Summary Found")
-                    print(taint_summary)
-                    # for taint in taint_summary:
-                    #     if taint in self.get_tainted_variables():
-                    #         print("      Action is using tainted variable")
-                    
-                    
-                    
-
-                
-                # for inputs in taint_summary["inputs"]:
-                #     print("      Analyzing Task Variable:", inputs)
-                #     # Checks to see if input could be tainted
-                #     if self.is_tainted(inputs):
-                #         print("        Variable: ", inputs, "is tainted")
-                #         # If its marked as tainted, the outputs will be affected as well
-                #         for outputs in taint_summary["outputs"]:
-                #             print("          Variable: ", outputs, "is tainted because it used a value touched by", inputs)
-                #             self.taint_variable(outputs)
+                    action_inputs = taint_summary['inputs']
+                    for inputs in action_inputs:
+                        if self.is_tainted(inputs):
+                            print("      Tainted Variable \'" + inputs + "\' has propagated to the Docker Action: \'" + docker_action + "\'")     
                             
 
 def main():

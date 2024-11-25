@@ -46,7 +46,8 @@ class Taint_Summaries:
         # This shows where the tainted vars propagate to.
         if "runs" in action_workflow:
             runs_obj = action_workflow["runs"]
-        
+            taint_summary['container_image'] = runs_obj['image']
+            taint_summary['container_args'] = runs_obj['args']
         self.add_summary(name, taint_summary)
         
 def get_yaml(action_file):
