@@ -22,14 +22,13 @@ class Taint_Summaries:
     
     def preload_summaries(self):
         #base_dir = "example/"
-        base_dir = "slack-notification-action/"
+        base_dir = "actions/"
         files = os.listdir(base_dir)
         for file in files:
-            if "action" in file:
-                action_file = base_dir + file
-                # Takes off .yaml extension
-                action_name = file[:-5]
-                self.parse_action(action_name, action_file)
+            action_file = base_dir + file
+            # Takes off .yaml extension
+            action_name = file[:-5]
+            self.parse_action(action_name, action_file)
             
     def parse_action(self, name, action_file=None):
         taint_summary = {}

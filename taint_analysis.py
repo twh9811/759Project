@@ -1,6 +1,3 @@
-import wir_generator
-import generate_action_summary
-
 class Docker_Action_Taint_Analysis:
     def __init__(self, WIR, summaries):
         self.wir = WIR
