@@ -37,11 +37,13 @@ class Taint_Summaries:
             taint_summary["inputs"] = list(workflow_inputs.keys())
             
         # Output parameters allow you to declare data that an action sets. Actions that run later in a workflow can use the output data set in previously run actions.
+        # Shows where tainted args propagate to
         if "outputs" in action_workflow:
             workflow_outputs = action_workflow["outputs"]
             taint_summary["outputs"] = list(workflow_outputs.keys())
             
         # Configures the image used for the Docker container action OR
+        # This shows where the tainted vars propagate to.
         if "runs" in action_workflow:
             runs_obj = action_workflow["runs"]
         

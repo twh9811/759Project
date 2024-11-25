@@ -12,7 +12,7 @@ def main():
     # Step 3: Perform static analysis on the WIR, using taint summaries for actions
     taint_analysis_summary = taint_analysis.Docker_Action_Taint_Analysis(workflow_intermediate_representation, taint_summaries)
     
-    print(taint_analysis_summary.get_tainted_variables())
+    taint_analysis_summary.get_tainted_variables()
     
 if __name__ == "__main__":
     main()

@@ -20,31 +20,53 @@ class Docker_Action_Taint_Analysis:
     def perform_analysis(self):
         print("Analyzing Workflow:", self.wir.get_name())
         jobs = self.wir.get_taskgroups()
-        print(jobs)
         for job in jobs:
             print(" Analyzing Job:", job)
             job_obj = jobs[job]
             tasks = job_obj["tasks"]
             for task in tasks:
-                print("   Analyzing Task:", task)
+                
+                
+                # These indicate the initial taint sources from the workflow.
+                ci_vars = tasks[task]["CIvars"]
+                args = tasks[task]["args"]
+                for var in ci_vars:
+                    print("  Analyzing For Initial Taints Based On CIVars")
+                    if var['type'] == "github" or var['type'] == "secrets":
+                        arg_index = var['arg_ref']
+                        tainted_variable = list(args.keys())[arg_index]
+                        print("    Variable \'" + tainted_variable + "\' has been tainted directly from user input")
+                        self.taint_variable(tainted_variable)
+                        
+                
+                print("  Analyzing Task:", task)
                 task_obj = tasks[task]
-                print(task_obj)
                 # Gets rid of the version tag for the action
                 docker_action = task_obj['exec']['executed'].split("@")[0]
+                print("    Uses Docker Action \'" + docker_action + "\'")
                 
                 taint_summary = None
                 if docker_action in self.summaries:
                     taint_summary = self.summaries[docker_action]
+                    print("      Taint Summary Found")
+                    print(taint_summary)
+                    # for taint in taint_summary:
+                    #     if taint in self.get_tainted_variables():
+                    #         print("      Action is using tainted variable")
+                    
+                    
+                    
+
                 
-                for inputs in taint_summary["inputs"]:
-                    print("      Analyzing Task Variable:", inputs)
-                    # Checks to see if input could be tainted
-                    if self.is_tainted(inputs):
-                        print("        Variable: ", inputs, "is tainted")
-                        # If its marked as tainted, the outputs will be affected as well
-                        for outputs in taint_summary["outputs"]:
-                            print("          Variable: ", outputs, "is tainted because it used a value touched by", inputs)
-                            self.taint_variable(outputs)
+                # for inputs in taint_summary["inputs"]:
+                #     print("      Analyzing Task Variable:", inputs)
+                #     # Checks to see if input could be tainted
+                #     if self.is_tainted(inputs):
+                #         print("        Variable: ", inputs, "is tainted")
+                #         # If its marked as tainted, the outputs will be affected as well
+                #         for outputs in taint_summary["outputs"]:
+                #             print("          Variable: ", outputs, "is tainted because it used a value touched by", inputs)
+                #             self.taint_variable(outputs)
                             
 
 def main():
