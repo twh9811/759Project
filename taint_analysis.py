@@ -25,7 +25,7 @@ class Docker_Action_Taint_Analysis:
             job_obj = jobs[job]
             tasks = job_obj["tasks"]
             for task in tasks:
-                print("  Analyzing Task:", task)
+                print("\n  Analyzing Task:", task)
                 
                 # Find the initial taint sources from the main workflow.
                 ci_vars = tasks[task]["CIvars"]
@@ -40,11 +40,9 @@ class Docker_Action_Taint_Analysis:
                     elif var['type'] == "github":
                         print("    Variable \'" + tainted_variable + "\' has been tainted directly from user input (GitHub event)")
                         self.taint_variable(tainted_variable)
-                    
-                        
                 
                 # Look at Docker Action Taints
-                print("   Analyzing Task:", task)
+                print("\n   Analyzing Task:", task)
                 task_obj = tasks[task]
                 # Gets rid of the version tag for the action
                 docker_action = task_obj['exec']['executed'].split("@")[0]
@@ -55,9 +53,6 @@ class Docker_Action_Taint_Analysis:
                 if docker_action in self.summaries:
                     taint_summary = self.summaries[docker_action]
                     print("      Taint Summary Found:", taint_summary)
-                    action_inputs = taint_summary['inputs']
-                    for inputs in action_inputs:
-                        tainted_var_str = "\'" + inputs + "\'"
-                        if self.is_tainted(inputs):
-                            print("      Tainted Variable", tainted_var_str, "has propagated to the Docker Action:", docker_action_str)
-                            print("       ", docker_action_str, "uses", tainted_var_str, "as args in", taint_summary['container_image'])
+                    for sink in taint_summary['sinks']:
+                        print("        Tainted Variable \'" + sink + "\' has been tained by a tainted source propagating to the Docker Action")
+                        self.taint_variable(sink)
