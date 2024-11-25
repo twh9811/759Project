@@ -1,7 +1,6 @@
 import yaml
 from yaml import SafeLoader
 import os
-import wir_generator
 
 class Taint_Summaries:
     

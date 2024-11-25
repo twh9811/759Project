@@ -1,0 +1,13 @@
+name: "Sample Workflow"
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Action Example
+        uses: sample_action@v1
+        with:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
