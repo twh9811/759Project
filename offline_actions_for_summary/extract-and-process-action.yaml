@@ -1,0 +1,13 @@
+name: "Extract and Process Data"
+inputs:
+  # Taint Propagation from workflow
+  input_text:
+    description: "Input text to extract and process"
+    required: true
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    # Further Taint Propagation
+    - ${{ inputs.input_text }}
