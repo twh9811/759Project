@@ -1,11 +1,12 @@
 import wir_generator
 import generate_action_summary
 import taint_analysis
-# BASE_DIR = "example/"
-BASE_DIR = "slack-notification-action/"
+BASE_DIR = "example/"
+#BASE_DIR = "slack-notification-action/"
 
 def main():
-    main_workflow = BASE_DIR + "slack-notification-workflow.yaml"
+    main_workflow = BASE_DIR + "sample-workflow.yaml"
+    #main_workflow = BASE_DIR + "slack-notification-workflow.yaml"
     # Step 1: Generate Taint Summaries
     taint_summaries = generate_action_summary.Taint_Summaries().get_summaries()
     # Step 2: Create a WIR of the main workflow
