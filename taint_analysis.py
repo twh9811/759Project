@@ -65,6 +65,9 @@ class Docker_Action_Taint_Analysis:
                     if docker_action in self.summaries:
                         taint_summary = self.summaries[docker_action]
                         print("      Taint Summary Found:", taint_summary)
-                        for sink in taint_summary['sinks']:
-                            print("        Tainted Variable \'" + sink + "\' has been tained by a tainted source propagating to the Docker Action")
-                            self.taint_variable(sink)
+                        if "sinks" in taint_summary:
+                            for sink in taint_summary['sinks']:
+                                print("        Tainted Variable \'" + sink + "\' has been tained by a tainted source propagating to the Docker Action")
+                                self.taint_variable(sink)
+                        else:
+                            print("        No Sinks In Summary")
