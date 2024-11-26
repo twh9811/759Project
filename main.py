@@ -7,6 +7,7 @@ BASE_DIR = "example/"
 def main():
     main_workflow = BASE_DIR + "sample-workflow.yaml"
     #main_workflow = BASE_DIR + "slack-notification-workflow.yaml"
+    # main_workflow = "20.yml"
     # Step 1: Generate Taint Summaries
     taint_summaries = generate_action_summary.Taint_Summaries().get_summaries()
     # Step 2: Create a WIR of the main workflow

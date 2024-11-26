@@ -13,3 +13,12 @@ jobs:
         with:
           # Taint Source
           input_text: ${{ github.event.pull_request.title }}
+  taint-test2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract and Process Data Numero Dos
+        id: extract_process
+        uses: docker/extract-and-process-action@v1
+        with:
+          # Taint Source
+          user_input_var: ${{ github.event.pull_request.title }}

@@ -22,7 +22,7 @@ class Docker_Action_Taint_Analysis:
             job_obj = jobs[job]
             tasks = job_obj["tasks"]
             for task in tasks:
-                print("\n  Analyzing Task:", task)
+                print("  Analyzing Task:", task)
                 
                 # Find the initial taint sources from the main workflow from command ingestion
                 ci_vars = tasks[task]["CIvars"]
@@ -71,3 +71,4 @@ class Docker_Action_Taint_Analysis:
                                 self.taint_variable(sink)
                         else:
                             print("        No Sinks In Summary")
+                print()
