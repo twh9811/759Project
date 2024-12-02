@@ -9,6 +9,7 @@ jobs:
     steps:
       - name: Extract and Process Data
         id: extract_process
+        # Taint Sink
         uses: /extract-and-process-action@v1
         with:
           # Taint Source
@@ -18,6 +19,7 @@ jobs:
     steps:
       - name: Extract and Process Data Numero Dos
         id: extract_process
+        # Taint Sink
         uses: /extract-and-process-action@v1
         with:
           # Taint Source

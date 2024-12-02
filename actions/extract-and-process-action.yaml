@@ -11,6 +11,7 @@ inputs:
 
 runs:
   using: "docker"
+  # Taint Sink
   image: "Dockerfile"
   args:
     # Further Taint Propagation
