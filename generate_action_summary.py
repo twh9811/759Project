@@ -80,7 +80,8 @@ class Taint_Summaries:
             # Only has support for python containers :(
             docker_base_dir = "docker/"
             docker_wir = parse_dockerfile(docker_base_dir + docker_filename)
-            print(docker_wir)
+            for key in docker_wir:
+                docker_summary[key] = docker_wir[key]
                 
         self.add_summary(name, taint_summary)
 
@@ -128,6 +129,7 @@ def parse_dockerfile(dockerfile_path):
                         # Extracts the referenced contents to see the input variable used.
                         # Should only be one result, hence 0 index usage
                         variable_contents = re.findall(DOCKER_VARIABLE_PATTERN, split_args[1])[0]
+                        # Stores sources in "reference variable -> new variable" format so we can identify the varaiable in the taint_flows field in the taint_analysis file.
                         if "sources" in docker_file_wir:
                             docker_file_wir["sources"][variable_contents] = docker_variable_name
                         else:

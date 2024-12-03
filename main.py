@@ -18,14 +18,14 @@ def main():
     for var in tainted_vars:
         print(var)
     print()
-    print("Tainted Flows (Indent Indicates File Propagation):")
+    print("Tainted Flows:")
+    num = 1
     for origin in tainted_flow:
-        print(origin)
-        spacing = " "
+        print("Flow", str(num), ":")
         flow = tainted_flow[origin]
         for affected_var in flow:
-            print(spacing + affected_var)
-            spacing += " "
+            print(affected_var)
+        num += 1
     
 if __name__ == "__main__":
     main()
