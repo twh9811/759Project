@@ -4,9 +4,9 @@ import os
 import re
 
 REFERENCE_PATTERN = "\\{\\{(.*?)}}"
-
+DOCKER_VARIABLE_PATTERN = "\\{(.*?)}"
 # Looks for any docker commands followed by a whitespace then captures the remaining args
-DOCKER_PATTERN = "(CMD)\\s+(.*)"
+DOCKER_PATTERN = "(CMD|ENV)\\s+(.*)"
 
 class Taint_Summaries:
     
@@ -63,7 +63,7 @@ class Taint_Summaries:
             taint_summary['docker_details'] = {}
             docker_summary = taint_summary['docker_details']
             docker_summary["container_image"] = docker_filename
-            
+                
             # Passes in args to docker container. Final sink before execution
             if "args" in runs_obj:
                 action_args = runs_obj['args']
@@ -80,8 +80,7 @@ class Taint_Summaries:
             # Only has support for python containers :(
             docker_base_dir = "docker/"
             docker_wir = parse_dockerfile(docker_base_dir + docker_filename)
-            for key in docker_wir:
-                docker_summary[key] = docker_wir[key]
+                
         self.add_summary(name, taint_summary)
 
 def parse_dockerfile(dockerfile_path):
@@ -93,15 +92,25 @@ def parse_dockerfile(dockerfile_path):
                 # Look for any docker args.
                 docker_vars = re.findall(DOCKER_PATTERN, line)
                 if len(docker_vars) > 0:
+                    print(docker_vars)
                     # Restricted to one docker var per line, so only one match (allowing index 0 usage). Gets it out of list format
                     docker_vars = docker_vars[0]
                     # The docker command being used i.e. CMD, FROM, WORKDIR, COPY, etc.
                     docker_command = docker_vars[0]
                     # The args passed into the command
                     docker_args = docker_vars[1]
-                    # Stores it in WIR format
-                    docker_file_wir["command"] = docker_command
-                    docker_file_wir["args"] = docker_args
+                    
+                    docker_file_wir["sinks"] = {}
+                    if docker_command == "CMD":
+                        continue
+                    # Format of ENV "variable_name="assigned_value""
+                    elif docker_command == "ENV":
+                        split_args = docker_args.split("=")
+                        docker_variable_name = split_args[0]
+                        # Extracts the referenced contents to see the input variable used.
+                        variable_contents = re.findall(DOCKER_VARIABLE_PATTERN, split_args[1])
+                        docker_file_wir["sinks"][variable_contents] = docker_variable_name
+                   
     return docker_file_wir
 
 def get_yaml(action_file):
@@ -112,7 +121,6 @@ def get_yaml(action_file):
 
 def main():
     summary_database = Taint_Summaries()
-    summary_database.preload_summaries()
     summary_database.display_summaries()
     
 if __name__ == "__main__":
