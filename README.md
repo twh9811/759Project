@@ -14,18 +14,16 @@ How to Use
 
     The output is located in the terminal and a file in the ./results/ folder
 
-Supported Project Types
-
-Currently supported docker types:
+Currently supported docker types: 
 
     Local Dockerfiles (✓)
     Remote Docker Images (X)
 
 Dataset
 
-    As discussed in the presentation, there is not a reliable way to find datasets for Docker actions. As a result the only tested
-    DefiHacks: https://github.com/MetaTrustLabs/GPTScan-DefiHacks
-    Top200: https://github.com/MetaTrustLabs/GPTScan-Top200
+    As discussed in the presentation, there is not a reliable way to find datasets for Docker actions. As a result this tool
+    was tested using hand-built workflows. This repository is set up to utilize one of these example workflows by default. If
+    a user wants to test their own workflow they need to modify the filepath in the main python file.
 
 Credits
 
