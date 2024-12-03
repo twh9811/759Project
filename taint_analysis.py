@@ -13,7 +13,7 @@ class Docker_Action_Taint_Analysis:
         self.tainted_variables.add(variable)
 
     def get_tainted_variables(self):
-        return self.tainted_variables
+        return self.tainted_variables, self.flow_tracking
 
     def perform_analysis(self):
         print("Analyzing Workflow:", self.wir.get_name())
@@ -72,7 +72,9 @@ class Docker_Action_Taint_Analysis:
                             for sink in taint_summary['sinks']:
                                 print("        Tainted Variable \'" + sink + "\' has been tained by a tainted source propagating to the Docker Action")
                                 self.taint_variable(sink)
+                                variable_name = sink.split(".")[1]
+                                if variable_name in self.flow_tracking:
+                                    self.flow_tracking[variable_name].append(sink)
                         else:
                             print("        No Sinks In Summary")
                 print()
-                print(self.flow_tracking)

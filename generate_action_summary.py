@@ -6,7 +6,7 @@ import re
 REFERENCE_PATTERN = "\\{\\{(.*?)}}"
 
 # Looks for any docker commands followed by a whitespace then captures the remaining args
-DOCKER_PATTERN = "(CMD|RUN|ARG)\\s+(.*)"
+DOCKER_PATTERN = "(CMD)\\s+(.*)"
 
 class Taint_Summaries:
     
@@ -60,7 +60,9 @@ class Taint_Summaries:
             if "image" not in runs_obj:
                 return
             docker_filename = runs_obj['image']
-            taint_summary['container_image'] = docker_filename
+            taint_summary['docker_details'] = {}
+            docker_summary = taint_summary['docker_details']
+            docker_summary["container_image"] = docker_filename
             
             # Passes in args to docker container. Final sink before execution
             if "args" in runs_obj:
@@ -74,10 +76,12 @@ class Taint_Summaries:
                             action_sinks.append(sink.strip())
                 taint_summary["sinks"] = action_sinks
         
-        docker_base_dir = "docker/"
-        docker_wir = parse_dockerfile(docker_base_dir + docker_filename)
-        print(docker_wir)
-                
+            # Parses dockerfile to get the command it executes using the passed in variables
+            # Only has support for python containers :(
+            docker_base_dir = "docker/"
+            docker_wir = parse_dockerfile(docker_base_dir + docker_filename)
+            for key in docker_wir:
+                docker_summary[key] = docker_wir[key]
         self.add_summary(name, taint_summary)
 
 def parse_dockerfile(dockerfile_path):
