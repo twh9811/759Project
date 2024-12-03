@@ -18,14 +18,16 @@ def main():
     for var in tainted_vars:
         print(var)
     print()
+    
     print("Tainted Flows:")
     num = 1
     for origin in tainted_flow:
-        print("Flow", str(num), ":")
+        print("Flow " + str(num) + ":")
         flow = tainted_flow[origin]
         for affected_var in flow:
-            print(affected_var)
+            print(" " + affected_var)
         num += 1
+        print()
     
 if __name__ == "__main__":
     main()

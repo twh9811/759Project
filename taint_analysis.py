@@ -80,18 +80,17 @@ class Docker_Action_Taint_Analysis:
                             
                         if "docker_details" in taint_summary:
                             docker_summary = taint_summary["docker_details"]
-                            flow_var = None
                             if "sources" in docker_summary:
                                 docker_sources = docker_summary["sources"]
                                 for ref_variable in docker_sources:
-                                    flow_var = ref_variable
-                                    new_variable = docker_sources[flow_var]
+                                    new_variable = docker_sources[ref_variable]
                                     print("        Tainted Variable \'" + new_variable + "\' has been tained by a tainted source propagating to the Docker File")
                                     self.taint_variable(new_variable)
-                                    self.flow_tracking[flow_var].append(new_variable)
-                            if "sinks" in docker_summary:
-                                docker_sinks = docker_summary["sinks"]
-                                for sink in docker_sinks:
-                                    if self.flow_tracking[flow_var]:
-                                        self.flow_tracking[flow_var].append(sink)
+                                    self.flow_tracking[ref_variable].append(new_variable)
+                                    
+                                    if "sinks" in docker_summary:
+                                        docker_sinks = docker_summary["sinks"]
+                                        for sink in docker_sinks:
+                                            if self.flow_tracking[ref_variable] and new_variable in sink:
+                                                self.flow_tracking[ref_variable].append(sink)
                 print()
