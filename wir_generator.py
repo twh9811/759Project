@@ -78,6 +78,7 @@ def get_yaml(action_file):
     return action_workflow
 
 def parse_dockerfile(dockerfile_path):
+    docker_file_wir = {}
     with open(dockerfile_path) as docker_file:
         for line in docker_file:
             # Skip any comments
@@ -87,12 +88,15 @@ def parse_dockerfile(dockerfile_path):
                 if len(docker_vars) > 0:
                     # Restricted to one docker var per line, so only one match (allowing index 0 usage). Gets it out of list format
                     docker_vars = docker_vars[0]
-                    # The docker var being used i.e. CMD, FROM, WORKDIR, COPY, etc.
-                    docker_var = docker_vars[0]
-                    # The args passed into the var
+                    # The docker command being used i.e. CMD, FROM, WORKDIR, COPY, etc.
+                    docker_command = docker_vars[0]
+                    # The args passed into the command
                     docker_args = docker_vars[1]
-                    print(docker_var)
-                    print(docker_args)
+                    # Stores it in WIR format
+                    docker_file_wir["command"] = docker_command
+                    docker_file_wir["args"] = docker_args
+    return docker_file_wir
+                    
 
 def parse_workflow(workflow_path):
     """
@@ -245,10 +249,10 @@ def parse_workflow(workflow_path):
     
     
 def main():
-    # github_action = "example/sample-workflow.yaml"
-    # #github_action = "slack-notification-action/slack-notification-workflow.yaml"
-    # wir = parse_workflow(github_action)
-    # wir.display_wir()
+    github_action = "example/sample-workflow.yaml"
+    wir = parse_workflow(github_action)
+    wir.display_wir()
+    print()
     test = "docker/Dockerfile"
     parse_dockerfile(test)
     
