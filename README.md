@@ -33,6 +33,13 @@ Limitations:
     Why? Time constraints. The support for these are relatively trivial, another parsing function needs to be added. But adding support for every type of Docker Action
     is not reasonable for the goal of the project. The main goal of propagating taints into Dockerfiles was achieved. It is already known that you can perform taint
     analysis on Python/JavaScript files with ease.
+
+    May crash or miss taints when other workflows are attempted to be used.
+
+    Why? As mentioned in the dataset section, finding thorough actions for testing was difficult given the time frame. The 
+    handmade workflow lacks depth and as a result it does not encapsulate every taint imaginable in Docker actions. Other
+    workflows may be missing parts that lack error handling, though most cases should be covered. The more likley result is
+    a blank result being displayed.
     
 
 Credits
