@@ -80,10 +80,19 @@ def get_yaml(action_file):
 def parse_dockerfile(dockerfile_path):
     with open(dockerfile_path) as docker_file:
         for line in docker_file:
+            # Skip any comments
             if "#" not in line:
+                # Look for any docker args.
                 docker_vars = re.findall(DOCKER_PATTERN, line)
                 if len(docker_vars) > 0:
-                    print(docker_vars)
+                    # Restricted to one docker var per line, so only one match (allowing index 0 usage). Gets it out of list format
+                    docker_vars = docker_vars[0]
+                    # The docker var being used i.e. CMD, FROM, WORKDIR, COPY, etc.
+                    docker_var = docker_vars[0]
+                    # The args passed into the var
+                    docker_args = docker_vars[1]
+                    print(docker_var)
+                    print(docker_args)
 
 def parse_workflow(workflow_path):
     """
