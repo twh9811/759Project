@@ -3,8 +3,8 @@ Description
 
 Uses the fundamental ideologies established in the ARGUS taint analysis engine and expands it to Docker actions.
 This is a standalone tool and does NOT work with ARGUS. Currently only works with select projects and is not tested
-on industry-datasets. This is meant more as a proof-of-concept to show that it is possible to complete given enough resources
-and time.
+on industry-datasets. This is meant more as a proof-of-concept to show that it is possible to complete in a real-world 
+setting given enough resources and time.
 
 How to Use
 
