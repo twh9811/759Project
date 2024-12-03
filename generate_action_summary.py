@@ -80,10 +80,20 @@ class Taint_Summaries:
             # Only has support for python containers :(
             docker_base_dir = "docker/"
             docker_wir = parse_dockerfile(docker_base_dir + docker_filename)
+            print(docker_wir)
                 
         self.add_summary(name, taint_summary)
 
 def parse_dockerfile(dockerfile_path):
+    """
+    Parsese a docker file and extracts any taint sources and sinks, stores them in WIR format
+
+    Args:
+        dockerfile_path (string): path to the dockerfile
+
+    Returns:
+        dictionary : Nested dictionary (WIR FORMAT) representing the dockerfile
+    """
     docker_file_wir = {}
     with open(dockerfile_path) as docker_file:
         for line in docker_file:
@@ -92,7 +102,6 @@ def parse_dockerfile(dockerfile_path):
                 # Look for any docker args.
                 docker_vars = re.findall(DOCKER_PATTERN, line)
                 if len(docker_vars) > 0:
-                    print(docker_vars)
                     # Restricted to one docker var per line, so only one match (allowing index 0 usage). Gets it out of list format
                     docker_vars = docker_vars[0]
                     # The docker command being used i.e. CMD, FROM, WORKDIR, COPY, etc.
@@ -100,17 +109,30 @@ def parse_dockerfile(dockerfile_path):
                     # The args passed into the command
                     docker_args = docker_vars[1]
                     
-                    docker_file_wir["sinks"] = {}
+                    
+                    # THIS IS THE FINAL SINK. DOCKER FILE EXECUTES USING THESE ARGS
                     if docker_command == "CMD":
-                        continue
+                        # Handles case if there are multiple args per command
+                        arg_parts = docker_args.split("&&")
+                        for arg_part in arg_parts:
+                            arg_part = arg_part.strip()
+                            if "sinks" in docker_file_wir:
+                                docker_file_wir["sinks"].append(arg_part)
+                            else:
+                                docker_file_wir["sinks"] = [arg_part]
                     # Format of ENV "variable_name="assigned_value""
+                    # THIS IS FOR TAINT SOURCES
                     elif docker_command == "ENV":
                         split_args = docker_args.split("=")
                         docker_variable_name = split_args[0]
                         # Extracts the referenced contents to see the input variable used.
-                        variable_contents = re.findall(DOCKER_VARIABLE_PATTERN, split_args[1])
-                        docker_file_wir["sinks"][variable_contents] = docker_variable_name
-                   
+                        # Should only be one result, hence 0 index usage
+                        variable_contents = re.findall(DOCKER_VARIABLE_PATTERN, split_args[1])[0]
+                        if "sources" in docker_file_wir:
+                            docker_file_wir["sources"][variable_contents] = docker_variable_name
+                        else:
+                            docker_file_wir["sources"] = {}
+                            docker_file_wir["sources"][variable_contents] = docker_variable_name
     return docker_file_wir
 
 def get_yaml(action_file):
