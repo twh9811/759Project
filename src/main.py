@@ -5,7 +5,7 @@ BASE_DIR = "src/example/"
 
 def write_to_file(filepath, tainted_vars, tainted_flow):
     """
-    Writes the summary to a file. Rewrites the file.
+    Writes the summary to a file. Rewrites the file everytime its ran.
 
     Args:
         filepath (string): Path to the file
@@ -18,7 +18,7 @@ def write_to_file(filepath, tainted_vars, tainted_flow):
             file.write(var + "\n")
 
         file.write("\nTainted Flows:\n")
-        num = 0
+        num = 1
         for origin in tainted_flow:
             file.write("\tFlow " + str(num) + ":\n")
             flow = tainted_flow[origin]
@@ -26,6 +26,7 @@ def write_to_file(filepath, tainted_vars, tainted_flow):
             for affected_var in flow:
                 file.write("\t\t\tPropagation: " + affected_var + "\n")
             num += 1
+    file.close()
     
 def main():
     main_workflow = BASE_DIR + "sample-workflow.yaml"
