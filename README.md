@@ -25,6 +25,16 @@ Dataset
     was tested using hand-built workflows. This repository is set up to utilize one of these example workflows by default. If
     a user wants to test their own workflow they need to modify the filepath in the main python file.
 
+Limitations: 
+
+    Stops taint propagation once the Dockerfile is reached
+    Only supports Dockerfiles that execute shell commands, does not support Dockerfiles that rely on external file execution (i.e. Python or JavaScript)
+
+    Why? Time constraints. The support for these are relatively trivial, another parsing function needs to be added. But adding support for every type of Docker Action
+    is not reasonable for the goal of the project. The main goal of propagating taints into Dockerfiles was achieved. It is already known that you can perform taint
+    analysis on Python/JavaScript files with ease.
+    
+
 Credits
 
 Rochester Institute of Technology Golisano College of Computer Science and Information Technology Department of Cybersecurity CSEC 795 : Advanced Software Security
