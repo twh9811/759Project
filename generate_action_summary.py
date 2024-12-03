@@ -5,6 +5,9 @@ import re
 
 REFERENCE_PATTERN = "\\{\\{(.*?)}}"
 
+# Looks for any docker commands followed by a whitespace then captures the remaining args
+DOCKER_PATTERN = "(CMD|RUN|ARG)\\s+(.*)"
+
 class Taint_Summaries:
     
     def __init__(self):
@@ -21,7 +24,6 @@ class Taint_Summaries:
         print(self.summaries)
     
     def preload_summaries(self):
-        #base_dir = "example/"
         base_dir = "actions/"
         files = os.listdir(base_dir)
         for file in files:
@@ -57,7 +59,8 @@ class Taint_Summaries:
             # Not a docker action.
             if "image" not in runs_obj:
                 return
-            taint_summary['container_image'] = runs_obj['image']
+            docker_filename = runs_obj['image']
+            taint_summary['container_image'] = docker_filename
             
             # Passes in args to docker container. Final sink before execution
             if "args" in runs_obj:
@@ -69,9 +72,34 @@ class Taint_Summaries:
                     if len(arg_sinks) > 0:
                         for sink in arg_sinks:
                             action_sinks.append(sink.strip())
-                taint_summary["sinks"] = action_sinks     
-        self.add_summary(name, taint_summary)
+                taint_summary["sinks"] = action_sinks
         
+        docker_base_dir = "docker/"
+        docker_wir = parse_dockerfile(docker_base_dir + docker_filename)
+        print(docker_wir)
+                
+        self.add_summary(name, taint_summary)
+
+def parse_dockerfile(dockerfile_path):
+    docker_file_wir = {}
+    with open(dockerfile_path) as docker_file:
+        for line in docker_file:
+            # Skip any comments
+            if "#" not in line:
+                # Look for any docker args.
+                docker_vars = re.findall(DOCKER_PATTERN, line)
+                if len(docker_vars) > 0:
+                    # Restricted to one docker var per line, so only one match (allowing index 0 usage). Gets it out of list format
+                    docker_vars = docker_vars[0]
+                    # The docker command being used i.e. CMD, FROM, WORKDIR, COPY, etc.
+                    docker_command = docker_vars[0]
+                    # The args passed into the command
+                    docker_args = docker_vars[1]
+                    # Stores it in WIR format
+                    docker_file_wir["command"] = docker_command
+                    docker_file_wir["args"] = docker_args
+    return docker_file_wir
+
 def get_yaml(action_file):
     with open(action_file) as action_file:
         action_workflow = yaml.load(action_file, Loader=SafeLoader)

@@ -2,6 +2,7 @@ class Docker_Action_Taint_Analysis:
     def __init__(self, WIR, summaries):
         self.wir = WIR
         self.summaries = summaries
+        self.flow_tracking = {}
         self.tainted_variables = set()
         self.perform_analysis()
         
@@ -36,6 +37,7 @@ class Docker_Action_Taint_Analysis:
                         if var_type == "github":
                             print("    Variable \'" + tainted_variable + "\' has been tainted directly from user input (GitHub event)")
                             self.taint_variable(tainted_variable)
+                            self.flow_tracking[tainted_variable] = []
                         else:
                             print("     CI Arg is of type \'" + var_type + "\' and not \'github\'. Not a source")
                             
@@ -47,7 +49,8 @@ class Docker_Action_Taint_Analysis:
                         var_contents = env_vars[var]
                         if "github." in var_contents:
                             print("    Variable \'" + var + "\' has been tainted directly from user input (GitHub event)")
-                            self.taint_variable(var)   
+                            self.taint_variable(var)  
+                            self.flow_tracking[tainted_variable] = [] 
                 
                 task_obj = tasks[task]
                 # Look at Docker Actions. Only actions have the exec tag.
@@ -72,3 +75,4 @@ class Docker_Action_Taint_Analysis:
                         else:
                             print("        No Sinks In Summary")
                 print()
+                print(self.flow_tracking)

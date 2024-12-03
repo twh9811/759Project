@@ -4,10 +4,6 @@ inputs:
   input_text:
     description: "Input text to extract and process"
     required: true
-  # Taint Propagation from workflow
-  user_input_var:
-    description: "Another Holding THing"
-    required: true
 
 runs:
   using: "docker"
@@ -16,5 +12,3 @@ runs:
   args:
     # Further Taint Propagation
     - ${{ inputs.input_text }}
-    # Further Taint Propagation
-    - ${{ inputs.user_input_var }}
