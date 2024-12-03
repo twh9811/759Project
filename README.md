@@ -21,9 +21,9 @@ Currently supported docker types:
 
 Dataset
 
-    As discussed in the presentation, there is not a reliable way to find datasets for Docker actions. As a result this tool
-    was tested using hand-built workflows. This repository is set up to utilize one of these example workflows by default. If
-    a user wants to test their own workflow they need to modify the filepath in the main python file.
+    As discussed in the presentation, there is not a reliable way to find datasets for GitHub Actions that utilize docker. 
+    As a result this tool was tested using hand-built workflows. This repository is set up to utilize one of these example 
+    workflows by default. If a user wants to test their own workflow they need to modify the filepath in the main python file.
 
 Limitations: 
 
