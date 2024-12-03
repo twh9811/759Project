@@ -226,12 +226,3 @@ def parse_workflow(workflow_path):
     return workflow_intermediate_representation
     
     
-def main():
-    github_action = "example/sample-workflow.yaml"
-    wir = parse_workflow(github_action)
-    wir.display_wir()
-    
-if __name__ == "__main__":
-    main()
-    
-    

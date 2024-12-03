@@ -24,7 +24,10 @@ class Taint_Summaries:
         print(self.summaries)
     
     def preload_summaries(self):
-        base_dir = "actions/"
+        """
+        Generates the summary database for use in the taint analysis
+        """
+        base_dir = "src/actions/"
         files = os.listdir(base_dir)
         for file in files:
             action_file = base_dir + file
@@ -32,15 +35,19 @@ class Taint_Summaries:
             action_name = file[:-5]
             self.parse_action(action_name, action_file)
             
-    def parse_action(self, name, action_file=None):
-        taint_summary = {}
-        if(action_file is None):
-            pass
-        else:
-            action_workflow = get_yaml(action_file)
+    def parse_action(self, name, action_file):
+        """
+        Parses out the inputs/outputs of an GitHub Action file.
         
+        Also handles the WIR generation of the dockerfile the GitHub Action refers to and stores it in the summary
 
-        
+        Args:
+            name (string): name of the GitHub Action
+            action_file (string): File path to the action file
+        """
+        taint_summary = {}
+        action_workflow = get_yaml(action_file)
+            
         # Input parameters allow you to specify data that the action expects to use during runtime. GitHub stores input parameters as environment variables.
         if "inputs" in action_workflow:
             workflow_inputs = action_workflow["inputs"]
@@ -61,6 +68,7 @@ class Taint_Summaries:
                 return
             docker_filename = runs_obj['image']
             taint_summary['docker_details'] = {}
+            # Assigns docker summary to be part of the taint summary
             docker_summary = taint_summary['docker_details']
             docker_summary["container_image"] = docker_filename
                 
@@ -69,6 +77,7 @@ class Taint_Summaries:
                 action_args = runs_obj['args']
                 
                 action_sinks = []
+                # Finds all of the referenced variables in the sinks and keeps track of them
                 for arg in action_args:
                     arg_sinks = re.findall(REFERENCE_PATTERN, arg)
                     if len(arg_sinks) > 0:
@@ -77,8 +86,7 @@ class Taint_Summaries:
                 taint_summary["sinks"] = action_sinks
         
             # Parses dockerfile to get the command it executes using the passed in variables
-            # Only has support for python containers :(
-            docker_base_dir = "docker/"
+            docker_base_dir = "src/docker/"
             docker_wir = parse_dockerfile(docker_base_dir + docker_filename)
             for key in docker_wir:
                 docker_summary[key] = docker_wir[key]
@@ -87,7 +95,7 @@ class Taint_Summaries:
 
 def parse_dockerfile(dockerfile_path):
     """
-    Parsese a docker file and extracts any taint sources and sinks, stores them in WIR format
+    Parses a docker file and extracts any taint sources and sinks, stores them in WIR format
 
     Args:
         dockerfile_path (string): path to the dockerfile
@@ -110,8 +118,7 @@ def parse_dockerfile(dockerfile_path):
                     # The args passed into the command
                     docker_args = docker_vars[1]
                     
-                    
-                    # THIS IS THE FINAL SINK. DOCKER FILE EXECUTES USING THESE ARGS
+                    # THIS IS THE FINAL SINK. DOCKER FILE EXECUTES USING THESE ARGS.
                     if docker_command == "CMD":
                         # Handles case if there are multiple args per command
                         arg_parts = docker_args.split("&&")
@@ -122,7 +129,7 @@ def parse_dockerfile(dockerfile_path):
                             else:
                                 docker_file_wir["sinks"] = [arg_part]
                     # Format of ENV "variable_name="assigned_value""
-                    # THIS IS FOR TAINT SOURCES
+                    # THIS IS FOR TAINT SOURCES IN THE DOCKERFILE
                     elif docker_command == "ENV":
                         split_args = docker_args.split("=")
                         docker_variable_name = split_args[0]
@@ -142,13 +149,6 @@ def get_yaml(action_file):
         action_workflow = yaml.load(action_file, Loader=SafeLoader)
     action_file.close()
     return action_workflow
-
-def main():
-    summary_database = Taint_Summaries()
-    summary_database.display_summaries()
-    
-if __name__ == "__main__":
-    main()
         
             
         
