@@ -1,0 +1,20 @@
+All Tainted Variables:
+
+inputs.input_text
+input_text
+user_input_var
+RENAMED_INPUT_TEXT
+inputs.user_input_var
+RENAMED_USER_INPUT_VAR
+
+Tainted Flows:
+	Flow 0:
+		Origin: input_text
+			Propagation: inputs.input_text
+			Propagation: RENAMED_INPUT_TEXT
+			Propagation: echo "${RENAMED_INPUT_TEXT}"
+	Flow 1:
+		Origin: user_input_var
+			Propagation: inputs.user_input_var
+			Propagation: RENAMED_USER_INPUT_VAR
+			Propagation: echo "${RENAMED_USER_INPUT_VAR}"
