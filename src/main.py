@@ -1,7 +1,7 @@
 import wir_generator
 import generate_action_summary
 import taint_analysis
-BASE_DIR = "src/example/"
+BASE_DIR = "src/workflows/"
 
 def write_to_file(filepath, tainted_vars, tainted_flow):
     """
