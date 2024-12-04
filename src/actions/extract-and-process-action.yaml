@@ -1,4 +1,5 @@
 name: "Extract and Process Data"
+# IMPORTANT NOTE, VARIABLE NAMES MUST MATCH BETWEEN WORKFLOW AND ACTION DEFINITIONS
 inputs:
   # Taint Propagation from workflow
   input_text:
@@ -6,7 +7,7 @@ inputs:
     required: true
   # Taint Propagation from workflow
   user_input_var:
-    description: "Another Holding THing"
+    description: "Input text to extract and process"
     required: true
 
 runs:
@@ -16,5 +17,5 @@ runs:
   args:
     # Further Taint Propagation
     - ${{ inputs.input_text }}
-    # Further Taint Propagation
+     # Further Taint Propagation
     - ${{ inputs.user_input_var }}

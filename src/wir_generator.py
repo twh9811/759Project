@@ -13,6 +13,7 @@ import re
 # Extracts any text between {{ }}
 # Python magic strikes again. Need to escape the escape character to make it see the brackets as a string
 REFERENCE_PATTERN = "\\{\\{(.*?)}}"
+
 GITHUB_CI_VARS = ["secrets.", "github.", "docker.","env.","inputs.","jobs.","steps."]
 
 class WIR:
@@ -60,10 +61,20 @@ class WIR:
                     print("    ", step + ":", step_contents)
                     
 def get_yaml(action_file):
+    """
+    Returns YAML file as a YAML object in python
+
+    Args:
+        action_file (file): File loaded in Python "File" object
+
+    Returns:
+        Yaml_File: The action file in a YAML object in python
+    """
     with open(action_file) as action_file:
         action_workflow = yaml.load(action_file, Loader=SafeLoader)
     action_file.close()
     return action_workflow
+                    
 
 def parse_workflow(workflow_path):
     """
@@ -213,15 +224,5 @@ def parse_workflow(workflow_path):
         
     # WIR should be built when all workflow is parsed
     return workflow_intermediate_representation
-        
-
-def main():
-    github_action = "example/sample-workflow.yaml"
-    #github_action = "slack-notification-action/slack-notification-workflow.yaml"
-    wir = parse_workflow(github_action)
-    wir.display_wir()
-    
-if __name__ == "__main__":
-    main()
     
     
