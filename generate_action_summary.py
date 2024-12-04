@@ -21,7 +21,6 @@ class Taint_Summaries:
         print(self.summaries)
     
     def preload_summaries(self):
-        #base_dir = "example/"
         base_dir = "actions/"
         files = os.listdir(base_dir)
         for file in files:
