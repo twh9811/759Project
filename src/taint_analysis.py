@@ -77,7 +77,7 @@ class Docker_Action_Taint_Analysis:
                         if "sinks" in taint_summary:
                             # Goes through the sinks and taints them accordingly.
                             for sink in taint_summary['sinks']:
-                                print("        Tainted Variable \'" + sink + "\' has been tained by a tainted source propagating to the Docker Action")
+                                print("        Tainted Variable \'" + sink + "\' has been tainted by a tainted source propagating to the Docker Action")
                                 self.taint_variable(sink)
                                 variable_name = sink.split(".")[1]
                                 if variable_name in self.flow_tracking:

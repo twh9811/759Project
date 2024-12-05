@@ -1,11 +1,11 @@
 All Tainted Variables:
 
+inputs.user_input_var
+RENAMED_USER_INPUT_VAR
 inputs.input_text
+RENAMED_INPUT_TEXT
 user_input_var
 input_text
-RENAMED_USER_INPUT_VAR
-RENAMED_INPUT_TEXT
-inputs.user_input_var
 
 Tainted Flows:
 	Flow 1:
